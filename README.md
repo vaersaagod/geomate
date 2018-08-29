@@ -10,7 +10,6 @@ redirects (based on country, continent, language, etc), site switcher... You nam
 
 This plugin requires Craft CMS 3.0.0 or later. The plugin also requires the zlib PHP extension.
 
-
 ## Installation
 
 To install the plugin, either install it from the plugin store, or follow these instructions:
@@ -19,6 +18,7 @@ To install the plugin, either install it from the plugin store, or follow these 
 2. Install the plugin in the Craft Control Panel under Settings → Plugins, or from the command line via `./craft install/plugin geomate`.
 3. For GeoMate to do anything, you need to [configure it](#configuring), and [download the geolocation database](#downloading-the-geolocation-database).
 
+---
 
 ## GeoMate Overview
 
@@ -31,6 +31,7 @@ are needed to look up IP information. By default GeoMate use the free Maxmind Ge
 database, but can easily be configured to use commercial versions of the database as long as it's 
 in the MaxMind DB file format. 
 
+---
 
 ## Downloading the geolocation database
 
@@ -42,6 +43,7 @@ You can also download the database by accessing the `geomate/database/update-dat
 action directly, or set up a cron job that hits it at regular intervals. The action URL for your 
 installation is shown in the utility.
 
+---
 
 ## Using GeoMate
 
@@ -64,6 +66,8 @@ it to get an idea of what the defaults are, and how you can use them to your nee
 _When working locally, you need to override the IP by using the `forceIp` config setting for
 GeoMate to do anything useful (since it would try to look up 127.0.0.1 if you didn't, and
 that won't return any results)._
+
+---
 
 ## Configuring
 
@@ -314,6 +318,7 @@ have a quality parameter (in this case, the range is from 0 to 100) that indicat
 the user is in these languages. This parameter indicates what quality level a language needs to have 
 for GeoMate to consider it a valid language.  
 
+---
 
 ## Template variables
 
@@ -398,6 +403,8 @@ browser languages.
 {% endfor %}
 ```
 
+---
+
 ## Twig filters
 
 ### addOverrideParam
@@ -407,14 +414,13 @@ Adds the override param and value to an URL.
 ### addRedirectParam
 Adds the redirect param and value to an URL. Not really that useful, but it's there. :)
 
+---
 
 ## Price, license and support
 
 The plugin is released under the MIT license, meaning you can do what ever you want with it as long 
 as you don't blame us. **It's free**, which means there is absolutely no support included, but you 
-might get it anyway. Just post an issue here on github if you have one, and I'll see what I can do. 
-It doesn't hurt to donate a beer or two at [Beerpay](https://beerpay.io/aelvan/Imager-Craft) either. 
-Just saying. :)
+might get it anyway. Just post an issue here on github if you have one, and we'll see what we can do. 
 
 ## Changelog
 
