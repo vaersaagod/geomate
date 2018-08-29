@@ -78,9 +78,9 @@ and overriding settings as needed.
 *Default: `true`*  
 Enables or disables caching of IP data.
 
-### cacheDuration [int]
-*Default: `43200`*  
-Duration, in seconds, that looked up IP data should be cached.
+### cacheDuration [string|int]
+*Default: `P7D`*  
+Duration that looked up IP data should be cached, set as a date interval string or an int indicating the number of seconds.
 
 ### useSeparateLogfile [bool]
 *Default: `true`*  
