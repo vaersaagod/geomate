@@ -1,0 +1,68 @@
+.geomate-utility .invisible { 
+    visibility: hidden;
+}
+
+.geomate-utility__error, 
+.geomate-utility__success {
+    padding: 10px 20px;
+}
+
+.geomate-utility__error { 
+    border: 1px solid #bd5a0c;
+}
+
+.geomate-utility__success { 
+    border: 1px solid #1e8449;
+}
+
+.geomate-utility__error:before,
+.geomate-utility__success:before {
+    display: inline-block;
+    padding-right: 5px;
+    position: relative;
+    top: -1px;
+    font-family: 'Craft';
+    speak: none;
+    -webkit-font-feature-settings: "liga", "dlig";
+    -moz-font-feature-settings: "liga=1, dlig=1";
+    -moz-font-feature-settings: "liga", "dlig";
+    -ms-font-feature-settings: "liga", "dlig";
+    -o-font-feature-settings: "liga", "dlig";
+    font-feature-settings: "liga", "dlig";
+    text-rendering: optimizeLegibility;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    font-style: normal;
+    vertical-align: middle;
+}
+
+.geomate-utility__error:before {
+    content: 'alert';
+}
+
+.geomate-utility__success:before {
+    content: 'globe';
+}
+
+.geomate-utility__block {
+    margin-bottom: 40px; 
+}
+
+.geomate-utility__block + .geomate-utility__block {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    padding-top: 20px;
+}
+
+.geomate-utility__btn {
+    font-size: 14px;
+}
+
+.geomate-utility__settings {
+    margin-top: 40px;
+}
