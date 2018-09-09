@@ -58,7 +58,7 @@ and display a banner or popup to trigger the user to switch site.
 
 GeoMate also provides a helper to build a site switcher, the `craft.geomate.getSiteLinks` template variable, 
 and some twig functions, `addOverrideParam` and `addRedirectParam`, to add the necessary parameters to ensure 
-that GeoMate picks up that the user has selected a spesific site.
+that GeoMate picks up that the user has selected a specific site.
 
 There's quite a few config settings that can be used to tweak stuff, so make sure you read through
 it to get an idea of what the defaults are, and how you can use them to your needs.
@@ -79,7 +79,7 @@ and overriding settings as needed.
 Enables or disables caching of IP data.
 
 ### cacheDuration [string|int]
-*Default: `P7D`*  
+*Default: `'P7D'`*  
 Duration that looked up IP data should be cached, set as a date interval string or an int indicating the number of seconds.
 
 ### useSeparateLogfile [bool]
