@@ -115,19 +115,22 @@ class GeoMate extends Plugin
         
         // Handle redirect functionality
         $request = Craft::$app->getRequest();
-        $session = Craft::$app->getSession();
         
-        if ($request->getIsSiteRequest() && !$request->getIsLivePreview() && !$request->getIsActionRequest() && $request->getMethod() === 'GET') {
-            if ($session->hasFlash('geomateIsRedirected') || $request->getParam($settings->redirectedParam, '') !== '') {
-                self::$isRedirected = true;
-            }
-            
-            if ($request->getParam($settings->redirectOverrideParam, '') !== '') {
-                $this->redirect->registerOverride();
-            }
-            
-            if ($settings->autoRedirectEnabled) {
-                $this->redirect->autoRedirect();
+        if (!$request->getIsConsoleRequest()) {
+            $session = Craft::$app->getSession();
+
+            if ($request->getIsSiteRequest() && !$request->getIsLivePreview() && !$request->getIsActionRequest() && $request->getMethod() === 'GET') {
+                if ($session->hasFlash('geomateIsRedirected') || $request->getParam($settings->redirectedParam, '') !== '') {
+                    self::$isRedirected = true;
+                }
+
+                if ($request->getParam($settings->redirectOverrideParam, '') !== '') {
+                    $this->redirect->registerOverride();
+                }
+
+                if ($settings->autoRedirectEnabled) {
+                    $this->redirect->autoRedirect();
+                }
             }
         }
     }
