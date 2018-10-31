@@ -81,8 +81,9 @@ class RedirectService extends Component
         }
         
         $countryInfo = GeoMate::$plugin->geo->getCountryInfo($ip);
+        $needsCountryInfo = !in_array($settings->redirectMapSimpleModeKey, ['language', 'languageRegion']);
 
-        if ($countryInfo === null) {
+        if ($countryInfo === null && $needsCountryInfo) {
             GeoMate::log('IP `'.$ip.'` was not found in country database.', Logger::LEVEL_WARNING);
             return null;
         }
