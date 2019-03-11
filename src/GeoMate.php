@@ -14,6 +14,7 @@ use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterComponentTypesEvent;
 use craft\services\Utilities;
+use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 
 use vaersaagod\geomate\services\CookieService;
@@ -72,10 +73,10 @@ class GeoMate extends Plugin
     {
         parent::init();
         self::$plugin = $this;
-        
+
         /** @var Settings $settings */
         $settings = $this->getSettings();
-        
+
         // Register services
         $this->setComponents([
             'geo' => GeoService::class,
@@ -83,14 +84,14 @@ class GeoMate extends Plugin
             'redirect' => RedirectService::class,
             'cookie' => CookieService::class,
         ]);
-        
+
         // Create a separate log file for GeoMate to keep things sane
         if ($settings->useSeparateLogfile) {
             $fileTarget = new \craft\log\FileTarget([
-                'logFile' => Craft::$app->getPath()->getLogPath(true) . '/geomate.log', 
+                'logFile' => Craft::$app->getPath()->getLogPath(true) . '/geomate.log',
                 'categories' => ['geomate']
             ]);
-        
+
             Craft::getLogger()->dispatcher->targets[] = $fileTarget;
         }
 
@@ -104,18 +105,52 @@ class GeoMate extends Plugin
                 $variable->set('geomate', GeoMateVariable::class);
             }
         );
-        
+
         // Add utility
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $event) {
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
             $event->types[] = GeoMateUtility::class;
         });
 
         // Register Twig extensions
         Craft::$app->view->registerTwigExtension(new GeoMateTwigExtension());
-        
+
         // Handle redirect functionality
-        $request = Craft::$app->getRequest();
+        Craft::$app->on(Application::EVENT_INIT, function () {
+            $this->redirectCheck();
+        });
+    }
+
+    /**
+     * @param string $message
+     * @param int $logLevel
+     */
+    public static function log($message, $logLevel = \yii\log\Logger::LEVEL_INFO)
+    {
+        /** @var Settings $settings */
+        $settings = self::$plugin->getSettings();
+
+        if ($settings->useSeparateLogfile) {
+            if ($logLevel <= $settings->logLevel || Craft::$app->getConfig()->getGeneral()->devMode) {
+                Craft::getLogger()->log($message, $logLevel, 'geomate');
+            }
+        } else {
+            Craft::getLogger()->log($message, $logLevel, 'geomate');
+        }
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @throws \craft\errors\MissingComponentException
+     */
+    protected function redirectCheck()
+    {
+        /** @var Settings $settings */
+        $settings = $this->getSettings();
         
+        $request = Craft::$app->getRequest();
+
         if (!$request->getIsConsoleRequest()) {
             $session = Craft::$app->getSession();
 
@@ -134,27 +169,6 @@ class GeoMate extends Plugin
             }
         }
     }
-
-    /**
-     * @param string $message
-     * @param int $logLevel
-     */
-    public static function log($message, $logLevel = \yii\log\Logger::LEVEL_INFO)
-    {
-        /** @var Settings $settings */
-        $settings = self::$plugin->getSettings();
-        
-        if ($settings->useSeparateLogfile) {
-            if ($logLevel <= $settings->logLevel || Craft::$app->getConfig()->getGeneral()->devMode) {
-                Craft::getLogger()->log($message, $logLevel, 'geomate');
-            }
-        } else {
-            Craft::getLogger()->log($message, $logLevel, 'geomate');
-        }
-    }
-
-    // Protected Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
