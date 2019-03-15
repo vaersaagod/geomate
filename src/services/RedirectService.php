@@ -200,12 +200,20 @@ class RedirectService extends Component
                 foreach ($criteria as $criteriaKey => $criteriaVal) {
                     switch ($criteriaKey) {
                         case 'country':
-                            if (strtolower($countryInfo->country->isoCode) !== strtolower($criteriaVal)) {
+                            if (\is_array($criteriaVal)) {
+                                if (!\in_array(strtolower($countryInfo->country->isoCode), $criteriaVal, true)) {
+                                    $isApplicable = false;
+                                }
+                            } elseif (strtolower($countryInfo->country->isoCode) !== strtolower($criteriaVal)) {
                                 $isApplicable = false;
                             }
                             break;
                         case 'continent':
-                            if (strtolower($countryInfo->continent->code) !== strtolower($criteriaVal)) {
+                            if (\is_array($criteriaVal)) {
+                                if (!\in_array(strtolower($countryInfo->continent->code), $criteriaVal, true)) {
+                                    $isApplicable = false;
+                                }
+                            } elseif (strtolower($countryInfo->continent->code) !== strtolower($criteriaVal)) {
                                 $isApplicable = false;
                             }
                             break;

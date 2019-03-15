@@ -28,8 +28,8 @@ use vaersaagod\geomate\models\Settings;
  */
 class GeoMateHelper
 {
-    
-    
+
+
     /**
      * @return bool
      */
@@ -81,7 +81,7 @@ class GeoMateHelper
     }
 
     /**
-     * @param string $languageCode
+     * @param string|array $languageCode
      * @param int $quality
      * @return bool
      */
@@ -91,8 +91,16 @@ class GeoMateHelper
 
         /** @var AcceptedLanguage $language */
         foreach ($languages as $language) {
-            if ($language->quality >= $quality && strtolower($language->language) === strtolower($languageCode)) {
-                return true;
+            if ($language->quality >= $quality) {
+                if (\is_array($languageCode)) {
+                    foreach ($languageCode as $singleLanguageCode) {
+                        if (strtolower($language->language) === strtolower($singleLanguageCode)) {
+                            return true;
+                        }
+                    }
+                } elseif (strtolower($language->language) === strtolower($languageCode)) {
+                    return true;
+                }
             }
         }
 
@@ -100,7 +108,7 @@ class GeoMateHelper
     }
 
     /**
-     * @param string $languageCode
+     * @param string|array $languageCode
      * @param int $quality
      * @return bool
      */
@@ -110,8 +118,16 @@ class GeoMateHelper
 
         /** @var AcceptedLanguage $language */
         foreach ($languages as $language) {
-            if ($language->quality >= $quality && strtolower($language->region) === strtolower($languageCode)) {
-                return true;
+            if ($language->quality >= $quality) {
+                if (\is_array($languageCode)) {
+                    foreach ($languageCode as $singleLanguageCode) {
+                        if (strtolower($language->region) === strtolower($singleLanguageCode)) {
+                            return true;
+                        }
+                    }
+                } elseif (strtolower($language->region) === strtolower($languageCode)) {
+                    return true;
+                }
             }
         }
 
