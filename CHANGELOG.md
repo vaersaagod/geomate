@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 1.0.4 - 2019-03-15
+### Added
+- Added support for using arrays in redirect map values.
+
 ## 1.0.3 - 2019-03-11
 ### Fixed
 - Fixes issue where getMatchedElement was called before the application was fully initialized (#6).

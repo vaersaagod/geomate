@@ -219,6 +219,20 @@ that might get a bit... edge-case:
 ]
 ```
 
+As of 1.0.4, the values in the redirect map can also be arrays:
+
+```
+'redirectMap' => [
+    'scandinavia' => [
+        'country' => ['no', 'se', 'dk', 'fi'],
+    ],
+    'europe' => [
+        'continent' => 'eu',
+    ],
+    'global' => '*' 
+]
+```
+
 Please note that this setting is not only used when `autoRedirectEnabled` is set to `true`, but also
 when you use `craft.geomate.redirectInformation`. 
 
