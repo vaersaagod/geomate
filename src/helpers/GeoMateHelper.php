@@ -65,16 +65,19 @@ class GeoMateHelper
     public static function getLanguages(): array
     {
         $r = [];
-        $languages = AcceptLanguage::getLanguages($_SERVER['HTTP_ACCEPT_LANGUAGE'], 100);
-
-        foreach ($languages as $quality => $info) {
-            $languageModel = new AcceptedLanguage();
-            $languageModel->quality = (int)$quality;
-            $languageModel->language = $info[0]['language'] ?? null;
-            $languageModel->region = $info[0]['region'] ?? null;
-            $languageModel->script = $info[0]['script'] ?? null;
-
-            $r[] = $languageModel;
+        
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $languages = AcceptLanguage::getLanguages($_SERVER['HTTP_ACCEPT_LANGUAGE'], 100);
+    
+            foreach ($languages as $quality => $info) {
+                $languageModel = new AcceptedLanguage();
+                $languageModel->quality = (int)$quality;
+                $languageModel->language = $info[0]['language'] ?? null;
+                $languageModel->region = $info[0]['region'] ?? null;
+                $languageModel->script = $info[0]['script'] ?? null;
+    
+                $r[] = $languageModel;
+            }
         }
 
         return $r;
