@@ -13,6 +13,7 @@ namespace vaersaagod\geomate\helpers;
 
 use Craft;
 use craft\base\Element;
+use craft\models\Site;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Teto\HTTP\AcceptLanguage;
 use vaersaagod\geomate\GeoMate;
@@ -154,7 +155,8 @@ class GeoMateHelper
     }
 
     /**
-     * @param $site
+     * @param Site $site
+     * @param bool $elementMatchOnly
      * @return bool|string
      */
     public static function getCurrentLinkForSite($site, $elementMatchOnly = false)
@@ -174,7 +176,7 @@ class GeoMateHelper
             }
         }
 
-        return \Yii::getAlias($url);
+        return Craft::parseEnv($url);
     }
 
     /**
