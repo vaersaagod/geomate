@@ -1,7 +1,11 @@
 # GeoMate Changelog
 
-## 1.0.5 - 2019-07-04
+## 1.0.6 - 2019-07-25
 ### Added
+- Added parsing of Craft style env variables in site urls (fixes #14).
+
+## 1.0.5 - 2019-07-04
+### Fixed
 - Fixes issue where `$_SERVER['HTTP_ACCEPT_LANGUAGE']` was not set and `redirectMapSimpleModeKey` was set to `language` (fixes #10).
 
 ## 1.0.4 - 2019-03-15
