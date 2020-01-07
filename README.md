@@ -10,6 +10,18 @@ redirects (based on country, continent, language, etc), site switcher... You nam
 
 This plugin requires Craft CMS 3.0.0 or later. The plugin also requires the zlib PHP extension.
 
+## IMPORTANT UPDATE
+
+As of December 30th 2019, the GeoLite2 databases are no longer publicly available
+[due to compliance with GDPR and CCPA](https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/).
+Previously, the public URLs for these databases were set as defaults in the GeoMate
+configuration. As of GeoMate 1.1.0, these have been removed, and
+you now need to register a maxmind account, get a license key, and configure the download 
+URLs yourself. See the ["Downloading the geolocation database"](https://github.com/vaersaagod/geomate#downloading-the-geolocation-database) 
+below for more info on how to do this.
+
+As before, you can also download the database manually and put it in your `dbPath` yourself. 
+
 ## Installation
 
 To install the plugin, either install it from the plugin store, or follow these instructions:
@@ -35,7 +47,26 @@ in the MaxMind DB file format.
 
 ## Downloading the geolocation database
 
-GeoMate comes with a handy utility that helps you download the database. After installing you can
+For GeoMate to be able to get information about an IP address, you need to download
+a GeoIP2 database. The easiest way to get one, is to use Maxmind's free GeoLite2
+database. For better results and more frequent updates, you should consider their 
+commercial alternatives.
+
+To get the GeoLite2 database, you first need to [sign up for an account at Maxmind](https://www.maxmind.com/en/geolite2/signup).
+Once you have access to your users control panel, you need to [create a license key](https://www.maxmind.com/en/accounts/current/license-key).
+Finally, you can get the download URL by [going to the direct download page](https://dev.maxmind.com/geoip/geoipupdate/#Direct_Downloads),
+and let GeoMate know about them by setting the `countryDbDownloadUrl` and `cityDbDownloadUrl` config settings
+accordingly. At the time of writing, the URLs should be (replace `cityDbDownloadUrl` with your license key):    
+
+```
+'countryDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=YOUR_LICENSE_KEY&suffix=tar.gz',
+'cityDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=`YOUR_LICENSE_KEY`&suffix=tar.gz',
+```
+
+_Please note, although this is the recommended approach, you can also just download the files
+manually, or through some other mechanism, and put them in the `dbPath` yourself._  
+
+GeoMate comes with a handy utility that helps you download the database. You can
 access it by going to Utilities > GeoMate from the control panel main menu. Please check that the 
 settings is as desired, and download the databases by clicking the "Update now" button.
 
@@ -99,19 +130,19 @@ stored in `/storage/geomate` or whichever path is defined as Craft's storage pat
 
 ### countryDbFilename [string]
 *Default: `'GeoLite2-Country.mmdb'`*  
-File name of the GeopIP _country_ database.
+File name of the GeoIP _country_ database.
 
 ### cityDbFilename [string]
 *Default: `'GeoLite2-City.mmdb'`*  
-File name of the GeopIP _city_ database.
+File name of the GeoIP _city_ database.
 
-### countryDbDownloadUrl [string]
-*Default: `'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz'`*  
-Download URL for the GeopIP _country_ database.
+### countryDbDownloadUrl [string|null]
+*Default: `null`*  
+Download URL for the GeoIP _country_ database.
 
-### cityDbDownloadUrl [string]
-*Default: `'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz'`*  
-Download URL for the GeopIP _city_ database.
+### cityDbDownloadUrl [string|null]
+*Default: `null`*  
+Download URL for the GeoIP _city_ database.
 
 ### downloadDbIfMissing [bool]
 *Default: `false`*  

@@ -1,5 +1,12 @@
 # GeoMate Changelog
 
+## 1.1.0 - 2020-01-07
+
+> {warning} As of December 30th 2019, the GeoLite2 databases are no longer publicly available [due to compliance with GDPR and CCPA](https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/). Previously, the public URLs for these databases were set as defaults in the GeoMate configuration. As of GeoMate 1.1.0, these have been removed, and you now need to register a maxmind account, get a license key, and configure the download URLs yourself. See the ["Downloading the geolocation database"](https://github.com/vaersaagod/geomate#downloading-the-geolocation-database) below for more info on how to do this.
+
+### Changed
+- Changed default values for `countryDbDownloadUrl` and `cityDbDownloadUrl` to `null`. URLs now needs to be added manually to be able to use GeoMate to download the databases (see #21).
+
 ## 1.0.6 - 2019-07-25
 ### Added
 - Added parsing of Craft style env variables in site urls (fixes #14).
