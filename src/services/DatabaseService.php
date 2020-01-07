@@ -107,7 +107,7 @@ class DatabaseService extends Component
         @unlink($sourcepath);
         
         if (!$result) {
-            GeoMate::log('An error occured when saving to ' . $type . ' database to `' . $destpath . '`.', Logger::LEVEL_ERROR);
+            GeoMate::log('An error occurred when saving to ' . $type . ' database to `' . $destpath . '`.', Logger::LEVEL_ERROR);
             return false;
         }
         
