@@ -27,10 +27,10 @@ $(document).ready(function () {
                         updateErrorHolder();
                     }
                 } else {
-                    $updateStatus.text('An error occured! Please check your settings and try again.');
+                    $updateStatus.text('An error occurred! Please check your settings and try again.');
                 }
             }).fail(function () {
-                $updateStatus.text('An error occured! Please check your settings and try again.');
+                $updateStatus.text('An error occurred! Please check your settings and try again.');
             }).always(function () {
                 $updateBtn.removeClass('disabled');
                 $updateSpinner.addClass('invisible');
