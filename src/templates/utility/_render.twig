@@ -1,6 +1,13 @@
 {# @var settings \vaersaagod\geomate\models\Settings #}
 
+{% set downloadUrlsMissing = not settings.countryDbDownloadUrl or not settings.cityDbDownloadUrl %}
 <div class="geomate-utility">
+    {% if downloadUrlsMissing %}
+        <p class="error geomate-utility__error" data-geomate-error>
+            Database download URLs have not been configured. 
+        </p>
+    {% endif %}
+    
     {% if not hasDatabase %}
         <p class="error geomate-utility__error" data-geomate-error>
             No database found! Please check the settings below, and download the GeoIP2 databases.
@@ -50,29 +57,36 @@
 
     </div>
     
-    <div class="geomate-utility__update geomate-utility__block">
-        <h2>Update database</h2>
-        {% set updateWarning = (memoryLimit | replace('M', '')) < 256 %}
-        
-        {% if updateWarning %}
+    {% if downloadUrlsMissing %}
+        <div class="geomate-utility__block">
+            <p><em>You need to add download URLs to be able to update your databases.</em></p>
+        </div>
+    {% else %}
+        <div class="geomate-utility__update geomate-utility__block">
+            <h2>Update database</h2>
+            {% set updateWarning = (memoryLimit | replace('M', '')) < 256 %}
+            
+            {% if updateWarning %}
+                <p>
+                    <em>Quite a bit of memory is needed to download and unzip the databases. You've currently allocated {{ memoryLimit }}, 
+                        which is less than the recommended amount (256M). This may lead to the database update failing.</em>
+                </p>
+            {% endif %}
+            
             <p>
-                <em>Quite a bit of memory is needed to download and unzip the databases. You've currently allocated {{ memoryLimit }}, 
-                    which is less than the recommended amount (256M). This may lead to the database update failing.</em>
+                <button class="geomate-utility__btn btn submit" data-update-url="{{ actionUrl('geomate/database/update-database', { returnResult: '1' }) }}" data-geomate-update-btn>Update {{ updateWarning ? 'anyway' : 'now' }}</button>
+                <span class="spinner invisible" data-geomate-update-spinner></span>
             </p>
-        {% endif %}
-        
-        <p>
-            <button class="geomate-utility__btn btn submit" data-update-url="{{ actionUrl('geomate/database/update-database', { returnResult: '1' }) }}" data-geomate-update-btn>Update {{ updateWarning ? 'anyway' : 'now' }}</button>
-            <span class="spinner invisible" data-geomate-update-spinner></span>
-        </p>
-        <p class="light" data-geomate-update-status>
-           &nbsp; 
-        </p>
-    </div>
-
-    <div class="geomate-utility__cron geomate-utility__block">
-        <h2>Update via controller action</h2>
-        <p>You can also update the database accessing the controller action URL below, for instance via a cron job.</p>
-        <p><strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database') }}</code></p>
-    </div>
+            <p class="light" data-geomate-update-status>
+               &nbsp; 
+            </p>
+        </div>
+    
+        <div class="geomate-utility__cron geomate-utility__block">
+            <h2>Update via controller action</h2>
+            <p>You can also update the database accessing the controller action URL below, for instance via a cron job.</p>
+            <p><strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database') }}</code></p>
+        </div>
+    {% endif %}
+    
 </div>

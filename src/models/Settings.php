@@ -66,14 +66,14 @@ class Settings extends Model
     public $cityDbFilename = 'GeoLite2-City.mmdb';
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $countryDbDownloadUrl = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz';
+    public $countryDbDownloadUrl = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $cityDbDownloadUrl = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
+    public $cityDbDownloadUrl = null;
 
     /**
      * @var boolean
