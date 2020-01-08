@@ -34,7 +34,7 @@ class DatabaseService extends Component
     {
         $resultCountry = $this->getDatabase('country');
         $resultCity = $this->getDatabase('city');
-        
+
         return $resultCountry && $resultCity;
     }
 
@@ -44,15 +44,15 @@ class DatabaseService extends Component
      * @throws \yii\base\ErrorException
      * @throws \yii\base\Exception
      */
-    private function getDatabase($type = 'country'): bool 
+    private function getDatabase($type = 'country'): bool
     {
         GeoMate::log('Updating database ' . $type, Logger::LEVEL_INFO);
-        
+
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
         $dbPath = $settings->dbPath;
         $tempPath = $settings->getTempPath();
-        
+
         if (!file_exists($dbPath)) {
             FileHelper::createDirectory($dbPath);
 
@@ -93,51 +93,57 @@ class DatabaseService extends Component
 
         $destpath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $filename);
 
-        $unzippedData = '';   
-        $zd = gzopen($sourcepath, 'r');
-        
-        while ($data = gzread($zd, 10000000)){
-            $unzippedData .= $data;
-        }
+        $archive = new \PharData($sourcepath);
+        $found = false;
 
-        gzclose($zd);
+        foreach (new \RecursiveIteratorIterator($archive) as $file) {
+            $fileInfo = pathinfo($file);
+            
+            if (isset($fileInfo['extension']) && $fileInfo['extension'] === 'mmdb') {
+                $found = true;
+                $result = file_put_contents($destpath, $file->getContent());
+                
+                if (!$result) {
+                    GeoMate::log('An error occured when saving the ' . $type . ' database to `' . $destpath . '`.', Logger::LEVEL_ERROR);
+                    return false;
+                }
+            }
+        }
         
-        $result = file_put_contents($destpath, $unzippedData);
-        
-        @unlink($sourcepath);
-        
-        if (!$result) {
-            GeoMate::log('An error occured when saving to ' . $type . ' database to `' . $destpath . '`.', Logger::LEVEL_ERROR);
+        if (!$found) {
+            GeoMate::log('No .mmdb files were found in `' . $sourcepath . '`.', Logger::LEVEL_ERROR);
             return false;
         }
-        
+
+        @unlink($sourcepath);
         return true;
     }
 
     /**
      * @return bool
      */
-    public function hasDatabase(): bool 
+    public function hasDatabase(): bool
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
         $dbPath = $settings->dbPath;
         $countryPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->countryDbFilename);
         $cityPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->cityDbFilename);
-        
+
         return file_exists($countryPath) && file_exists($cityPath);
     }
 
     /**
      * @return \DateTime|null
+     * @throws \Exception
      */
-    public function getDatabaseTimestamp() 
+    public function getDatabaseTimestamp()
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
         $dbPath = $settings->dbPath;
         $countryPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->countryDbFilename);
-        
+
         return file_exists($countryPath) ? new \DateTime('@' . filemtime($countryPath)) : null;
     }
 }
