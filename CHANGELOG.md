@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 1.1.0.1 - 2020-01-08
+### Fixed
+- Fixed an issue where unpacking the new .tar.gz file would result in a corrupt database (fixes #22).
+
 ## 1.1.0 - 2020-01-07
 
 > {warning} As of December 30th 2019, the GeoLite2 databases are no longer publicly available [due to compliance with GDPR and CCPA](https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/). Previously, the public URLs for these databases were set as defaults in the GeoMate configuration. As of GeoMate 1.1.0, these have been removed, and you now need to register a maxmind account, get a license key, and configure the download URLs yourself. See the ["Downloading the geolocation database"](https://github.com/vaersaagod/geomate#downloading-the-geolocation-database) below for more info on how to do this.
