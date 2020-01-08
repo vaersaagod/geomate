@@ -56,7 +56,7 @@ To get the GeoLite2 database, you first need to [sign up for an account at Maxmi
 Once you have access to your users control panel, you need to [create a license key](https://www.maxmind.com/en/accounts/current/license-key).
 Finally, you can get the download URL by [going to the direct download page](https://dev.maxmind.com/geoip/geoipupdate/#Direct_Downloads),
 and let GeoMate know about them by setting the `countryDbDownloadUrl` and `cityDbDownloadUrl` config settings
-accordingly. At the time of writing, the URLs should be (replace `cityDbDownloadUrl` with your license key):    
+accordingly. At the time of writing, the URLs should be (replace `YOUR_LICENSE_KEY` with your license key):    
 
 ```
 'countryDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=YOUR_LICENSE_KEY&suffix=tar.gz',

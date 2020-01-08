@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 1.1.0.2 - 2020-01-08
+### Fixed
+- Fixed spelling errors and readme.
+
 ## 1.1.0.1 - 2020-01-08
 ### Fixed
 - Fixed an issue where unpacking the new .tar.gz file would result in a corrupt database (fixes #22).
