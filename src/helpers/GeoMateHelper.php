@@ -171,7 +171,7 @@ class GeoMateHelper
         if ($currentElement && isset($currentElement->url) && $currentElement->url !== '') {
             $redirectElement = Craft::$app->getElements()->getElementById($currentElement->id, \get_class($currentElement), $site->id);
 
-            if ($redirectElement && isset($redirectElement->url) && $redirectElement->url !== '') {
+            if ($redirectElement && $redirectElement->enabled && $redirectElement->enabledForSite && isset($redirectElement->url) && $redirectElement->url !== '') {
                 $url = $redirectElement->url;
             }
         }
