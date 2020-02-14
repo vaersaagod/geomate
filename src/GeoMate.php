@@ -143,6 +143,7 @@ class GeoMate extends Plugin
 
     /**
      * @throws \craft\errors\MissingComponentException
+     * @throws \craft\errors\SiteNotFoundException
      */
     protected function redirectCheck()
     {
@@ -162,8 +163,8 @@ class GeoMate extends Plugin
                 if ($request->getParam($settings->redirectOverrideParam, '') !== '') {
                     $this->redirect->registerOverride();
                 }
-
-                if ($settings->autoRedirectEnabled) {
+                
+                if ($settings->autoRedirectEnabled && !in_array(Craft::$app->getSites()->getCurrentSite()->handle, $settings->autoRedirectExclude, true)) {
                     $this->redirect->autoRedirect();
                 }
             }

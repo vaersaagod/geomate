@@ -88,6 +88,11 @@ class Settings extends Model
     /**
      * @var array
      */
+    public $autoRedirectExclude = [];
+
+    /**
+     * @var array
+     */
     public $redirectMap = [];
 
     /**

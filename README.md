@@ -159,6 +159,10 @@ take up alot of resources depending on what fails.
 *Default: `false`*  
 Set this to `true` to enable automatic redirects of users to sites based on the `redirectMap` config setting.
 
+### autoRedirectExclude [array]
+*Default: `[]`*  
+A list of site handles that should be excluded from automatic redirects.
+
 ### redirectMap [array]
 *Default: `[]`*  
 This powerful config setting enables you to create detailed rules for redirecting users to 
