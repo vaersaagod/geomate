@@ -1,5 +1,12 @@
 # GeoMate Changelog
 
+## 1.2.0 - 2020-02-14
+### Added
+- Added support for `autoRedirectExclude` which can be used to exclude sites from automatic redirect when `$autoRedirectEnabled` is `true` (fixes #24).
+
+### Fixed
+- Fixed an issue with the `redirectMatchingElementOnly` config setting where GeoMate would try to redirect to a different site even if an element was not enabled (fixes #25).
+
 ## 1.1.0.2 - 2020-01-08
 ### Fixed
 - Fixed spelling errors and readme.
