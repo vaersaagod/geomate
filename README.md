@@ -60,7 +60,7 @@ accordingly. At the time of writing, the URLs should be (replace `YOUR_LICENSE_K
 
 ```
 'countryDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=YOUR_LICENSE_KEY&suffix=tar.gz',
-'cityDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=`YOUR_LICENSE_KEY`&suffix=tar.gz',
+'cityDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=YOUR_LICENSE_KEY&suffix=tar.gz',
 ```
 
 _Please note, although this is the recommended approach, you can also just download the files
