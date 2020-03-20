@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 1.2.1 - 2020-03-20
+### Changed
+- Changed behavior of `Application::EVENT_INIT` event handler, the GeoMate handler is now prepended instead of appended (fixes #29).
+
 ## 1.2.0 - 2020-02-14
 ### Added
 - Added support for `autoRedirectExclude` which can be used to exclude sites from automatic redirect when `$autoRedirectEnabled` is `true` (fixes #24).
