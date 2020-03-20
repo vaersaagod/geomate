@@ -117,7 +117,7 @@ class GeoMate extends Plugin
         // Handle redirect functionality
         Craft::$app->on(Application::EVENT_INIT, function () {
             $this->redirectCheck();
-        });
+        }, null, false);
     }
 
     /**
