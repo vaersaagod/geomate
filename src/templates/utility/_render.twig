@@ -64,7 +64,7 @@
     {% else %}
         <div class="geomate-utility__update geomate-utility__block">
             <h2>Update database</h2>
-            {% set updateWarning = (memoryLimit | replace('M', '')) < 256 %}
+            {% set updateWarning = (memoryLimit | replace('G', '000') | replace('M', '')) < 256 %}
             
             {% if updateWarning %}
                 <p>
