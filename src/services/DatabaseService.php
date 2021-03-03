@@ -90,7 +90,7 @@ class DatabaseService extends Component
 
         $client = Craft::createGuzzleClient();
 
-        if (\GuzzleHttp\ClientInterface::MAJOR_VERSION >= 7) {
+        if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION') && \GuzzleHttp\ClientInterface::MAJOR_VERSION >= 7) {
             $response = $client->get($url, ['sink' => $sourcepath]);
         } else {
             $response = $client->get($url, ['save_to' => $sourcepath]);
