@@ -89,7 +89,12 @@ class DatabaseService extends Component
         $sourcepath = FileHelper::normalizePath($tempPath . DIRECTORY_SEPARATOR . $basename);
 
         $client = Craft::createGuzzleClient();
-        $response = $client->get($url, ['save_to' => $sourcepath]);
+
+        if (\GuzzleHttp\ClientInterface::MAJOR_VERSION >= 7) {
+            $response = $client->get($url, ['sink' => $sourcepath]);
+        } else {
+            $response = $client->get($url, ['save_to' => $sourcepath]);
+        }
 
         $destpath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $filename);
 
