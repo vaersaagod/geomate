@@ -1,5 +1,12 @@
 # GeoMate Changelog
 
+## 1.3.0 - 2021-03-03
+### Added
+- Added console command `geomate/database/update-database` to update database from the console (Thanks, @johnnynotsolucky).
+
+### Fixed
+- Fixed an issue with database downloads when using Craft 3.6 with Guzzle 7.
+
 ## 1.2.1 - 2020-03-20
 ### Changed
 - Changed behavior of `Application::EVENT_INIT` event handler, the GeoMate handler is now prepended instead of appended (fixes #29).
