@@ -151,7 +151,7 @@ class RedirectService extends Component
         $params = [];
         parse_str($queryString, $params);
 
-        if (isset($params[$settings->redirectOverrideParam] && $params[$settings->redirectOverrideParam] === $settings->paramValue) ) {
+        if (isset($params[$settings->redirectOverrideParam]) && $params[$settings->redirectOverrideParam] === $settings->paramValue) {
             return $val;
         }
 
