@@ -146,6 +146,15 @@ class RedirectService extends Component
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
+        
+        $queryString = parse_url($val, PHP_URL_QUERY);
+        $params = [];
+        parse_str($queryString, $params);
+
+        if (isset($params[$settings->redirectOverrideParam] && $params[$settings->redirectOverrideParam] === $settings->paramValue) ) {
+            return $val;
+        }
+
         return GeoMateHelper::addUrlParam($val, $settings->redirectOverrideParam, $settings->paramValue);
     }
 
