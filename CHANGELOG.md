@@ -1,6 +1,6 @@
 # GeoMate Changelog
 
-## 1.3.1
+## 1.3.1 - 2021-07-20
 ### Fixed
 - Fixes an issue where the `redirectOverrideParam` could be included multiple times in the URL query string
 - Fixes an issue where Geomate could redirect Preview requests  
