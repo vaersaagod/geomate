@@ -3,7 +3,7 @@
 ## Unreleased
 ### Fixed
 - Fixes an issue where the `redirectOverrideParam` could be included multiple times in the URL query string
-- Use UrlHelper::url to rewrite the query string
+- Fixes an issue where Geomate could redirect Preview requests  
 
 ## 1.3.0 - 2021-03-03
 ### Added
@@ -11,6 +11,7 @@
 
 ### Fixed
 - Fixed an issue with database downloads when using Craft 3.6 with Guzzle 7.
+- Fixes an issue where Geomate could redirect Preview requests
 
 ## 1.2.1 - 2020-03-20
 ### Changed

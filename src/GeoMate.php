@@ -144,30 +144,32 @@ class GeoMate extends Plugin
     /**
      * @throws \craft\errors\MissingComponentException
      * @throws \craft\errors\SiteNotFoundException
+     * @throws \yii\web\BadRequestHttpException
      */
     protected function redirectCheck()
     {
+
         /** @var Settings $settings */
         $settings = $this->getSettings();
         
         $request = Craft::$app->getRequest();
 
-        if (!$request->getIsConsoleRequest()) {
-            $session = Craft::$app->getSession();
+        if ($request->getIsConsoleRequest() || !$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsPreview() || !!Craft::$app->getRequest()->getToken() || $request->getIsLivePreview()) {
+            return;
+        }
 
-            if ($request->getIsSiteRequest() && !$request->getIsLivePreview() && !$request->getIsActionRequest() && $request->getMethod() === 'GET') {
-                if ($session->hasFlash('geomateIsRedirected') || $request->getParam($settings->redirectedParam, '') !== '') {
-                    self::$isRedirected = true;
-                }
+        $session = Craft::$app->getSession();
 
-                if ($request->getParam($settings->redirectOverrideParam, '') !== '') {
-                    $this->redirect->registerOverride();
-                }
-                
-                if ($settings->autoRedirectEnabled && !in_array(Craft::$app->getSites()->getCurrentSite()->handle, $settings->autoRedirectExclude, true)) {
-                    $this->redirect->autoRedirect();
-                }
-            }
+        if ($session->hasFlash('geomateIsRedirected') || $request->getParam($settings->redirectedParam, null)) {
+            self::$isRedirected = true;
+        }
+
+        if ($request->getParam($settings->redirectOverrideParam, null)) {
+            $this->redirect->registerOverride();
+        }
+
+        if ($settings->autoRedirectEnabled && !in_array(Craft::$app->getSites()->getCurrentSite()->handle, $settings->autoRedirectExclude, true)) {
+            $this->redirect->autoRedirect();
         }
     }
 
