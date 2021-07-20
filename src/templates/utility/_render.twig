@@ -1,5 +1,7 @@
 {# @var settings \vaersaagod\geomate\models\Settings #}
 
+{% from '_includes/forms' import copyTextField %}
+
 {% set downloadUrlsMissing = not settings.countryDbDownloadUrl or not settings.cityDbDownloadUrl %}
 <div class="geomate-utility">
     {% if downloadUrlsMissing %}
@@ -77,16 +79,25 @@
                 <button class="geomate-utility__btn btn submit" data-update-url="{{ actionUrl('geomate/database/update-database', { returnResult: '1' }) }}" data-geomate-update-btn>Update {{ updateWarning ? 'anyway' : 'now' }}</button>
                 <span class="spinner invisible" data-geomate-update-spinner></span>
             </p>
-            <p class="light" data-geomate-update-status>
-               &nbsp; 
-            </p>
+            <p class="light" data-geomate-update-status></p>
         </div>
     
         <div class="geomate-utility__cron geomate-utility__block">
-            <h2>Update via controller action</h2>
-            <p>You can also update the database accessing the controller action URL below, for instance via a cron job.</p>
-            <p><strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database') }}</code></p>
+            <h2>Updating the database via action URL or console command</h2>
+            <p>You can also update the database accessing the controller action URL or console command, for instance via a cron job.</p>
+
+            {{ copyTextField({
+                label: 'Action URL',
+                value: actionUrl('geomate/database/update-database')
+            }) }}
+
+            {{ copyTextField({
+                label: 'Console command',
+                value: "php #{alias('@root')}/craft geomate/database/update-database"
+            }) }}
+
         </div>
+
     {% endif %}
     
 </div>
