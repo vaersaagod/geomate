@@ -13,6 +13,7 @@ namespace vaersaagod\geomate\helpers;
 
 use Craft;
 use craft\base\Element;
+use craft\helpers\UrlHelper;
 use craft\models\Site;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Teto\HTTP\AcceptLanguage;
@@ -66,17 +67,17 @@ class GeoMateHelper
     public static function getLanguages(): array
     {
         $r = [];
-        
+
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $languages = AcceptLanguage::getLanguages($_SERVER['HTTP_ACCEPT_LANGUAGE'], 100);
-    
+
             foreach ($languages as $quality => $info) {
                 $languageModel = new AcceptedLanguage();
                 $languageModel->quality = (int)$quality;
                 $languageModel->language = $info[0]['language'] ?? null;
                 $languageModel->region = $info[0]['region'] ?? null;
                 $languageModel->script = $info[0]['script'] ?? null;
-    
+
                 $r[] = $languageModel;
             }
         }
@@ -187,7 +188,7 @@ class GeoMateHelper
      */
     public static function addUrlParam($url, $param, $value): string
     {
-        return $url . (strpos($url, '?') === false ? '?' : '&') . $param . '=' . $value;
+        return UrlHelper::url($url, [$param => $value]);
     }
 
     /**
@@ -197,6 +198,6 @@ class GeoMateHelper
      */
     public static function addQueryString($url, $queryString): string
     {
-        return $url . (strpos($url, '?') === false ? '?' : '&') . $queryString;
+        return UrlHelper::url($url, $queryString);
     }
 }

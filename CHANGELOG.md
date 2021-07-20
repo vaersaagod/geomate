@@ -1,5 +1,10 @@
 # GeoMate Changelog
 
+## Unreleased
+### Fixed
+- Fixes an issue where the `redirectOverrideParam` could be included multiple times in the URL query string
+- Use UrlHelper::url to rewrite the query string
+
 ## 1.3.0 - 2021-03-03
 ### Added
 - Added console command `geomate/database/update-database` to update database from the console (Thanks, @johnnynotsolucky).
