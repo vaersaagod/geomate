@@ -1,7 +1,5 @@
 {# @var settings \vaersaagod\geomate\models\Settings #}
 
-{% from '_includes/forms' import copyTextField %}
-
 {% set downloadUrlsMissing = not settings.countryDbDownloadUrl or not settings.cityDbDownloadUrl %}
 <div class="geomate-utility">
     {% if downloadUrlsMissing %}
@@ -86,16 +84,26 @@
             <h2>Updating the database via action URL or console command</h2>
             <p>You can also update the database accessing the controller action URL or console command, for instance via a cron job.</p>
 
-            {{ copyTextField({
-                label: 'Action URL',
-                value: actionUrl('geomate/database/update-database')
-            }) }}
-
-            {{ copyTextField({
-                label: 'Console command',
-                value: "php #{alias('@root')}/craft geomate/database/update-database"
-            }) }}
-
+            <p>
+                <strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database') }}</code><br>
+                <strong>Console command:</strong> <code>php {{ alias('@root') }}/craft geomate/database/update-database</code>
+            </p>
+            
+            {#
+                When bumping the requirements to 3.6, we can do:
+                
+                {% from '_includes/forms' import copyTextField %}
+                
+                {{ copyTextField({
+                    label: 'Action URL',
+                    value: actionUrl('geomate/database/update-database')
+                }) }}
+    
+                {{ copyTextField({
+                    label: 'Console command',
+                    value: "php #{alias('@root')}/craft geomate/database/update-database"
+                }) }}
+            #}
         </div>
 
     {% endif %}
