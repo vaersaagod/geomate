@@ -1,22 +1,24 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate\services;
 
 use Craft;
 use craft\base\Component;
-use GeoIp2\Exception\AddressNotFoundException;
-use MaxMind\Db\Reader\InvalidDatabaseException;
-use vaersaagod\geomate\models\Settings;
-use vaersaagod\geomate\GeoMate;
 use GeoIp2\Database\Reader;
+use GeoIp2\Exception\AddressNotFoundException;
+use GeoIp2\Model\City;
+use GeoIp2\Model\Country;
+use MaxMind\Db\Reader\InvalidDatabaseException;
+use vaersaagod\geomate\GeoMate;
+use vaersaagod\geomate\models\Settings;
 use yii\log\Logger;
 
 /**
@@ -28,10 +30,9 @@ class GeoService extends Component
 {
     // Public Methods
     // =========================================================================
-
     /**
      * @param null|string $ip
-     * @return \GeoIp2\Model\City|\GeoIp2\Model\Country|mixed|null
+     * @return City|Country|mixed|null
      */
     public function getCountryInfo($ip = null)
     {
@@ -71,7 +72,7 @@ class GeoService extends Component
 
     /**
      * @param null|string $ip
-     * @return \GeoIp2\Model\City|\GeoIp2\Model\Country|mixed|null
+     * @return City|Country|mixed|null
      */
     public function getCityInfo($ip = null)
     {
@@ -102,11 +103,10 @@ class GeoService extends Component
 
     // Private Methods
     // =========================================================================
-
     /**
      * @param $type
      * @param $ip
-     * @return \GeoIp2\Model\City|\GeoIp2\Model\Country|null
+     * @return City|Country|null
      */
     private function getInfoByType($type, $ip)
     {
@@ -132,22 +132,18 @@ class GeoService extends Component
 
         try {
             $reader = new Reader($dbPath);
-        } catch (InvalidDatabaseException $e) {
-            GeoMate::log('Database read error (InvalidDatabaseException) :: ' . $e->getMessage(), Logger::LEVEL_ERROR);
+        } catch (InvalidDatabaseException $invalidDatabaseException) {
+            GeoMate::log('Database read error (InvalidDatabaseException) :: ' . $invalidDatabaseException->getMessage(), Logger::LEVEL_ERROR);
             return null;
         }
 
         try {
-            if ($type === 'city') {
-                $data = $reader->city($ip);
-            } else {
-                $data = $reader->country($ip);
-            }
-        } catch (InvalidDatabaseException $e) {
-            GeoMate::log('Database read error (InvalidDatabaseException) :: ' . $e->getMessage(), Logger::LEVEL_ERROR);
+            $data = $type === 'city' ? $reader->city($ip) : $reader->country($ip);
+        } catch (InvalidDatabaseException $invalidDatabaseException) {
+            GeoMate::log('Database read error (InvalidDatabaseException) :: ' . $invalidDatabaseException->getMessage(), Logger::LEVEL_ERROR);
             return null;
-        } catch (AddressNotFoundException $e) {
-            GeoMate::log('Database read error (AddressNotFoundException) :: ' . $e->getMessage(), Logger::LEVEL_ERROR);
+        } catch (AddressNotFoundException $addressNotFoundException) {
+            GeoMate::log('Database read error (AddressNotFoundException) :: ' . $addressNotFoundException->getMessage(), Logger::LEVEL_ERROR);
             return null;
         }
 
@@ -157,7 +153,6 @@ class GeoService extends Component
     /**
      * @param string $type
      * @param string $ip
-     * @return string
      */
     private function getCacheKey($type, $ip): string
     {

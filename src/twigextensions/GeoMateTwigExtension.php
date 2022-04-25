@@ -2,9 +2,11 @@
 
 namespace vaersaagod\geomate\twigextensions;
 
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use vaersaagod\geomate\GeoMate;
 
-class GeoMateTwigExtension extends \Twig_Extension
+class GeoMateTwigExtension extends AbstractExtension
 {
     // Public Methods
     // =========================================================================
@@ -19,49 +21,21 @@ class GeoMateTwigExtension extends \Twig_Extension
         return 'GeoMate';
     }
 
-    /**
-     * Returns an array of Twig filters, used in Twig templates via:
-     *
-     *      {{ 'something' | someFilter }}
-     *
-     * @return array
-     */
     public function getFilters(): array
     {
         return [
-            new \Twig_SimpleFilter('addOverrideParam', [$this, 'addOverrideParam']),
-            new \Twig_SimpleFilter('addRedirectParam', [$this, 'addRedirectParam']),
+            new TwigFilter('addOverrideParam', fn(string $val): string => $this->addOverrideParam($val)),
+            new TwigFilter('addRedirectParam', fn(string $val): string => $this->addRedirectParam($val)),
         ];
     }
 
-    /**
-     * Returns an array of Twig functions, used in Twig templates via:
-     *
-     *      {% set this = someFunction('something') %}
-     *
-     * @return array
-     */
-    public function getFunctions():array
-    {
-        return [
-            //new \Twig_SimpleFunction('lorem', [$this, 'lorem']),
-        ];
-    }
 
-    /**
-     * @param string $val
-     * @return string
-     */
-    public function addOverrideParam($val): string
+    public function addOverrideParam(string $val): string
     {
         return GeoMate::$plugin->redirect->addOverrideParam($val);
     }
 
-    /**
-     * @param string $val
-     * @return string
-     */
-    public function addRedirectParam($val): string
+    public function addRedirectParam(string $val): string
     {
         return GeoMate::$plugin->redirect->addRedirectParam($val);
     }

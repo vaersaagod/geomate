@@ -1,18 +1,18 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate\helpers;
 
-
 use Craft;
 use craft\base\Element;
+use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
@@ -30,20 +30,11 @@ use vaersaagod\geomate\models\Settings;
  */
 class GeoMateHelper
 {
-
-
-    /**
-     * @return bool
-     */
     public static function isCrawler(): bool
     {
-        $crawlerDetect = new CrawlerDetect();
-        return $crawlerDetect->isCrawler();
+        return (new CrawlerDetect())->isCrawler();
     }
 
-    /**
-     * @return bool
-     */
     public static function isRedirected(): bool
     {
         /** @var Settings $settings */
@@ -51,9 +42,6 @@ class GeoMateHelper
         return GeoMate::$isRedirected || (Craft::$app->getRequest()->getParam($settings->redirectedParam, '') !== '');
     }
 
-    /**
-     * @return bool
-     */
     public static function isOverridden(): bool
     {
         /** @var Settings $settings */
@@ -61,9 +49,6 @@ class GeoMateHelper
         return Craft::$app->getRequest()->getParam($settings->redirectOverrideParam, '') !== '';
     }
 
-    /**
-     * @return array
-     */
     public static function getLanguages(): array
     {
         $r = [];
@@ -85,12 +70,7 @@ class GeoMateHelper
         return $r;
     }
 
-    /**
-     * @param string|array $languageCode
-     * @param int $quality
-     * @return bool
-     */
-    public static function isAcceptedLanguage($languageCode, $quality = 80): bool
+    public static function isAcceptedLanguage(array|string $languageCode, int $quality = 80): bool
     {
         $languages = self::getLanguages();
 
@@ -112,12 +92,7 @@ class GeoMateHelper
         return false;
     }
 
-    /**
-     * @param string|array $languageCode
-     * @param int $quality
-     * @return bool
-     */
-    public static function isAcceptedLanguageRegion($languageCode, $quality = 80): bool
+    public static function isAcceptedLanguageRegion(array|string $languageCode, int $quality = 80): bool
     {
         $languages = self::getLanguages();
 
@@ -139,9 +114,6 @@ class GeoMateHelper
         return false;
     }
 
-    /**
-     * @return array
-     */
     public static function getSiteLinks(): array
     {
         $r = [];
@@ -155,48 +127,32 @@ class GeoMateHelper
         return $r;
     }
 
-    /**
-     * @param Site $site
-     * @param bool $elementMatchOnly
-     * @return bool|string
-     */
-    public static function getCurrentLinkForSite($site, $elementMatchOnly = false)
+    public static function getCurrentLinkForSite(Site $site, bool $elementMatchOnly = false): bool|string
     {
         // Get the site URL for the found site, this will be the fallback if we're not on an element's url
-        $url = $elementMatchOnly ? null : $site->baseUrl;
-
+        $url = $elementMatchOnly ? null : $site->getBaseUrl();
+        
         // Check if we're on an element's url, then prefer to redirect to that url
         /** @var Element $currentElement */
         $currentElement = Craft::$app->getUrlManager()->getMatchedElement();
+        
+        if ($currentElement && $currentElement->getUrl() !== null && $currentElement->getUrl() !== '') {
+            $redirectElement = Craft::$app->getElements()->getElementById($currentElement->getId(), $currentElement::class, $site->id);
 
-        if ($currentElement && isset($currentElement->url) && $currentElement->url !== '') {
-            $redirectElement = Craft::$app->getElements()->getElementById($currentElement->id, \get_class($currentElement), $site->id);
-
-            if ($redirectElement && $redirectElement->enabled && $redirectElement->enabledForSite && isset($redirectElement->url) && $redirectElement->url !== '') {
+            if ($redirectElement && $redirectElement->enabled && $redirectElement->getEnabledForSite($site->id) && (method_exists($redirectElement, 'getUrl') && $redirectElement->getUrl() !== null && $redirectElement->getUrl() !== '')) {
                 $url = $redirectElement->url;
             }
         }
-
-        return Craft::parseEnv($url);
+        
+        return App::parseEnv($url);
     }
 
-    /**
-     * @param string $url
-     * @param string $param
-     * @param string $value
-     * @return string
-     */
-    public static function addUrlParam($url, $param, $value): string
+    public static function addUrlParam(string $url, string $param, string $value): string
     {
         return UrlHelper::url($url, [$param => $value]);
     }
 
-    /**
-     * @param string $url
-     * @param string $queryString
-     * @return string
-     */
-    public static function addQueryString($url, $queryString): string
+    public static function addQueryString(string $url, string $queryString): string
     {
         return UrlHelper::url($url, $queryString);
     }

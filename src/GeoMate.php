@@ -1,32 +1,37 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site.
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate;
 
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin;
+use craft\errors\MissingComponentException;
+use craft\errors\SiteNotFoundException;
 use craft\events\RegisterComponentTypesEvent;
 use craft\services\Utilities;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
-
+use vaersaagod\geomate\models\Settings;
 use vaersaagod\geomate\services\CookieService;
+
 use vaersaagod\geomate\services\DatabaseService;
 use vaersaagod\geomate\services\GeoService;
 use vaersaagod\geomate\services\RedirectService;
 use vaersaagod\geomate\twigextensions\GeoMateTwigExtension;
 use vaersaagod\geomate\utilities\GeoMateUtility;
 use vaersaagod\geomate\variables\GeoMateVariable;
-use vaersaagod\geomate\models\Settings;
-
 use yii\base\Event;
+use yii\log\Logger;
+
+use yii\web\BadRequestHttpException;
 
 /**
  * Class GeoMate
@@ -48,12 +53,12 @@ class GeoMate extends Plugin
     /**
      * @var GeoMate
      */
-    public static $plugin;
+    public static GeoMate $plugin;
 
     /**
      * @var boolean
      */
-    public static $isRedirected = false;
+    public static bool $isRedirected = false;
 
     // Public Properties
     // =========================================================================
@@ -61,7 +66,7 @@ class GeoMate extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     // Public Methods
     // =========================================================================
@@ -69,7 +74,7 @@ class GeoMate extends Plugin
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         self::$plugin = $this;
@@ -87,19 +92,22 @@ class GeoMate extends Plugin
 
         // Create a separate log file for GeoMate to keep things sane
         if ($settings->useSeparateLogfile) {
+            // TODO 4.0: Need to replace this with... monolog?
+            /*
             $fileTarget = new \craft\log\FileTarget([
                 'logFile' => Craft::$app->getPath()->getLogPath(true) . '/geomate.log',
                 'categories' => ['geomate']
             ]);
 
             Craft::getLogger()->dispatcher->targets[] = $fileTarget;
+            */
         }
 
         // Add template variable
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function (Event $event) {
+            static function(Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('geomate', GeoMateVariable::class);
@@ -107,7 +115,7 @@ class GeoMate extends Plugin
         );
 
         // Add utility
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $event) {
             $event->types[] = GeoMateUtility::class;
         });
 
@@ -115,7 +123,7 @@ class GeoMate extends Plugin
         Craft::$app->view->registerTwigExtension(new GeoMateTwigExtension());
 
         // Handle redirect functionality
-        Craft::$app->on(Application::EVENT_INIT, function () {
+        Craft::$app->on(Application::EVENT_INIT, function() {
             $this->redirectCheck();
         }, null, false);
     }
@@ -124,7 +132,7 @@ class GeoMate extends Plugin
      * @param string $message
      * @param int $logLevel
      */
-    public static function log($message, $logLevel = \yii\log\Logger::LEVEL_INFO)
+    public static function log($message, $logLevel = Logger::LEVEL_INFO)
     {
         /** @var Settings $settings */
         $settings = self::$plugin->getSettings();
@@ -140,11 +148,10 @@ class GeoMate extends Plugin
 
     // Protected Methods
     // =========================================================================
-
     /**
-     * @throws \craft\errors\MissingComponentException
-     * @throws \craft\errors\SiteNotFoundException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws MissingComponentException
+     * @throws SiteNotFoundException
+     * @throws BadRequestHttpException
      */
     protected function redirectCheck()
     {
@@ -154,7 +161,7 @@ class GeoMate extends Plugin
         
         $request = Craft::$app->getRequest();
 
-        if ($request->getIsConsoleRequest() || !$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsPreview() || !!Craft::$app->getRequest()->getToken() || $request->getIsLivePreview()) {
+        if ($request->getIsConsoleRequest() || !$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsPreview() || (bool)Craft::$app->getRequest()->getToken() || $request->getIsLivePreview()) {
             return;
         }
 
@@ -176,9 +183,8 @@ class GeoMate extends Plugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
-
 }

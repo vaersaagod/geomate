@@ -1,5 +1,10 @@
 # GeoMate Changelog
 
+## Unreleased
+### Added
+- Added Craft 4 support.
+
+
 ## 1.3.1.2 - 2021-07-20
 ### Fixed
 - Fixed accidental use of macro from Craft 3.6 (fixes #43).

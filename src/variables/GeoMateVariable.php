@@ -1,18 +1,21 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate\variables;
 
+use GeoIp2\Model\City;
+use GeoIp2\Model\Country;
 use vaersaagod\geomate\GeoMate;
-
 use vaersaagod\geomate\helpers\GeoMateHelper;
+
+use vaersaagod\geomate\models\RedirectInfo;
 
 /**
  * @author    Værsågod
@@ -23,7 +26,7 @@ class GeoMateVariable
 {
     /**
      * @param null|string $ip
-     * @return \GeoIp2\Model\City|\GeoIp2\Model\Country|mixed|null
+     * @return City|Country|mixed|null
      */
     public function country($ip = null)
     {
@@ -41,7 +44,7 @@ class GeoMateVariable
 
     /**
      * @param null|string $ip
-     * @return \GeoIp2\Model\City|\GeoIp2\Model\Country|mixed|null
+     * @return City|Country|mixed|null
      */
     public function city($ip = null)
     {
@@ -50,48 +53,33 @@ class GeoMateVariable
 
     /**
      * @param null|string $ip
-     * @return null|\vaersaagod\geomate\models\RedirectInfo
+     * @return null|RedirectInfo
      */
     public function redirectInformation($ip = null)
     {
         return GeoMate::$plugin->redirect->getRedirectInfo($ip);
     }
 
-    /**
-     * @return bool
-     */
     public function isCrawler(): bool
     {
         return GeoMateHelper::isCrawler();
     }
 
-    /**
-     * @return bool
-     */
     public function isRedirected(): bool
     {
         return GeoMateHelper::isRedirected();
     }
 
-    /**
-     * @return bool
-     */
     public function isOverridden(): bool
     {
         return GeoMateHelper::isOverridden();
     }
 
-    /**
-     * @return array
-     */
     public function getSiteLinks(): array
     {
         return GeoMateHelper::getSiteLinks();
     }
 
-    /**
-     * @return array
-     */
     public function getLanguages(): array
     {
         return GeoMateHelper::getLanguages();

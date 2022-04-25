@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate\models;
@@ -17,11 +17,14 @@ use craft\helpers\FileHelper;
 use vaersaagod\geomate\GeoMate;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
+use yii\log\Logger;
 
 /**
  * @author    Værsågod
  * @package   GeoMate
  * @since     1.0.0
+ *
+ * @property-read string $tempPath
  */
 class Settings extends Model
 {
@@ -31,12 +34,12 @@ class Settings extends Model
     /**
      * @var boolean
      */
-    public $cacheEnabled = true;
+    public bool $cacheEnabled = true;
 
     /**
      * @var int|string
      */
-    public $cacheDuration = 'P7D';
+    public int|string $cacheDuration = 'P7D';
 
     /**
      * @var boolean
@@ -46,7 +49,7 @@ class Settings extends Model
     /**
      * @var int
      */
-    public $logLevel = \yii\log\Logger::LEVEL_ERROR;
+    public $logLevel = Logger::LEVEL_ERROR;
 
     /**
      * Location of Maxmind DB's. If none given, they will be stored inside /storage.
@@ -68,12 +71,12 @@ class Settings extends Model
     /**
      * @var string|null
      */
-    public $countryDbDownloadUrl = null;
+    public $countryDbDownloadUrl;
 
     /**
      * @var string|null
      */
-    public $cityDbDownloadUrl = null;
+    public $cityDbDownloadUrl;
 
     /**
      * @var boolean
@@ -162,12 +165,12 @@ class Settings extends Model
     /**
      * @var null|string
      */
-    public $forceIp = null;
+    public $forceIp;
 
     /**
      * @var null|string
      */
-    public $fallbackIp = null;
+    public $fallbackIp;
 
     /**
      * @var int
@@ -180,32 +183,27 @@ class Settings extends Model
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [];
     }
 
-    public function init()
+    public function init(): void
     {
         if (empty($this->dbPath)) {
             try {
                 $this->dbPath = Craft::$app->getPath()->getStoragePath() . DIRECTORY_SEPARATOR . 'geomate' . DIRECTORY_SEPARATOR;
-            } catch (Exception $e) {
-
+            } catch (Exception) {
             }
         }
         
         try {
             $this->cacheDuration = ConfigHelper::durationInSeconds($this->cacheDuration);
             $this->cookieDuration = ConfigHelper::durationInSeconds($this->cookieDuration);
-        } catch (InvalidConfigException $e) {
-            
+        } catch (InvalidConfigException) {
         }
     }
 
-    /**
-     * @return string
-     */
     public function getDbPath(): string
     {
         return $this->dbPath;
@@ -213,16 +211,12 @@ class Settings extends Model
 
     /**
      * @param string $type
-     * @return string
      */
     public function getDbFilePath($type = 'country'): string
     {
         return FileHelper::normalizePath($this->dbPath . DIRECTORY_SEPARATOR . ($type === 'city' ? $this->cityDbFilename : $this->countryDbFilename));
     }
 
-    /**
-     * @return string
-     */
     public function getTempPath(): string
     {
         return FileHelper::normalizePath(Craft::$app->getPath()->getTempPath(true) . DIRECTORY_SEPARATOR . 'geomate' . DIRECTORY_SEPARATOR);

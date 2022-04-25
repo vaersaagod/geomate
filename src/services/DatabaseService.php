@@ -1,20 +1,23 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate\services;
 
 use Craft;
-use craft\helpers\FileHelper;
 use craft\base\Component;
+use craft\helpers\FileHelper;
+use GuzzleHttp\ClientInterface;
 use vaersaagod\geomate\GeoMate;
 use vaersaagod\geomate\models\Settings;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\log\Logger;
 
 /**
@@ -40,9 +43,8 @@ class DatabaseService extends Component
 
     /**
      * @param string $type
-     * @return bool
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     private function getDatabase($type = 'country'): bool
     {
@@ -50,7 +52,7 @@ class DatabaseService extends Component
 
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
-        $dbPath = $settings->dbPath;
+        $dbPath = $settings->getDbPath();
         $tempPath = $settings->getTempPath();
 
         if (!file_exists($dbPath)) {
@@ -90,7 +92,7 @@ class DatabaseService extends Component
 
         $client = Craft::createGuzzleClient();
 
-        if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION') && \GuzzleHttp\ClientInterface::MAJOR_VERSION >= 7) {
+        if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION') && ClientInterface::MAJOR_VERSION >= 7) {
             $response = $client->get($url, ['sink' => $sourcepath]);
         } else {
             $response = $client->get($url, ['save_to' => $sourcepath]);
@@ -124,14 +126,11 @@ class DatabaseService extends Component
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function hasDatabase(): bool
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
-        $dbPath = $settings->dbPath;
+        $dbPath = $settings->getDbPath();
         $countryPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->countryDbFilename);
         $cityPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->cityDbFilename);
 
@@ -146,7 +145,7 @@ class DatabaseService extends Component
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
-        $dbPath = $settings->dbPath;
+        $dbPath = $settings->getDbPath();
         $countryPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->countryDbFilename);
 
         return file_exists($countryPath) ? new \DateTime('@' . filemtime($countryPath)) : null;

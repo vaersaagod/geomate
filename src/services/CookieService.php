@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 3.x
+ * GeoMate plugin for Craft CMS 4.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2018 Værsågod
+ * @copyright Copyright (c) 2022 Værsågod
  */
 
 namespace vaersaagod\geomate\services;
@@ -20,12 +20,11 @@ use vaersaagod\geomate\models\Settings;
  * @package   GeoMate
  * @since     1.0.0
  *
- * @property null|string|\craft\models\Site $overrideCookie
+ * @property null|string|Site $overrideCookie
  * @property string $cookie
  */
 class CookieService extends Component
 {
-
     /**
      * @param Site $site
      */
@@ -58,10 +57,10 @@ class CookieService extends Component
     private function setCookie($name, $value = '', $expire = 0, $path = '/', $domain = '', $secure = false, $httponly = false)
     {
         if ($value === '') {
-            $expire = (int)(time() - 3600);
+            $expire = time() - 3600;
         }
 
-        setcookie($name, $value, (int)$expire, $path, $domain, $secure, $httponly);
+        setcookie($name, $value, ['expires' => (int)$expire, 'path' => $path, 'domain' => $domain, 'secure' => $secure, 'httponly' => $httponly]);
         $_COOKIE[$name] = $value;
     }
 
@@ -77,5 +76,4 @@ class CookieService extends Component
 
         return null;
     }
-
 }

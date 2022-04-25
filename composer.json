@@ -1,7 +1,7 @@
 {
     "name": "vaersaagod/geomate",
     "description": "GeoMate is a friend in need for all things geolocation. IP to geo lookup, automatic redirects (based on country, continent, language, etc), site switcher... You name it.",
-    "version": "v1.3.1.2",
+    "version": "2.0.0-beta.1",
     "type": "craft-plugin",
     "keywords": [
         "craft",
@@ -26,9 +26,10 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.1.0",
-		"geoip2/geoip2": "~2.0",
-        "jaybizzle/crawler-detect" :"~1.0",
+        "php": "^8.0",
+        "craftcms/cms": "^4.0.0-beta.4",
+		    "geoip2/geoip2": "^2.0.0",
+        "jaybizzle/crawler-detect" :"^1.0.0",
         "zonuexe/http-accept-language" :"^0.4"
     },
     "suggest": {
