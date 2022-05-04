@@ -1,6 +1,6 @@
 # GeoMate Changelog
 
-## Unreleased
+## 4.0.0 - 2022-05-04
 ### Added
 - Added Craft 4 support.
 
