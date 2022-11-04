@@ -1,9 +1,14 @@
 # GeoMate Changelog
 
+## 2.1.0 - 2022-10-04
+### Changed  
+- Auto-redirects based on browser language now always work, regardless of GeoMate having access to a geolocation database or not. #53  
+### Fixed
+- Fixed an issue where GeoMate could throw an exception if the geolocation database was missing, and the `redirectMapSimpleModeKey` setting was set to `language`. #52  
+
 ## 2.0.0 - 2022-05-04
 ### Added
-- Added Craft 4 support.
-
+- Added Craft 4 support.  
 
 ## 1.3.1.2 - 2021-07-20
 ### Fixed

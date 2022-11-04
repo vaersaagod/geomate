@@ -81,14 +81,6 @@ class RedirectService extends Component
             return null;
         }
         
-        $countryInfo = GeoMate::$plugin->geo->getCountryInfo($ip);
-        $needsCountryInfo = !in_array($settings->redirectMapSimpleModeKey, ['language', 'languageRegion']);
-
-        if ($countryInfo === null && $needsCountryInfo) {
-            GeoMate::log('IP `' . $ip . '` was not found in country database.', Logger::LEVEL_WARNING);
-            return null;
-        }
-
         $redirectMap = $customMap ?: $settings->redirectMap;
         $isOverridden = false;
 
@@ -96,7 +88,7 @@ class RedirectService extends Component
             $applicableSite = Craft::$app->getSites()->getSiteByHandle($overrideCookie);
             $isOverridden = true;
         } else {
-            $applicableSiteHandle = $this->getSiteFromInfoAndMap($countryInfo, $redirectMap);
+            $applicableSiteHandle = $this->getSiteHandleFromRedirectMap($redirectMap, $ip);
 
             if ($applicableSiteHandle === null) {
                 return null;
@@ -176,9 +168,10 @@ class RedirectService extends Component
     // =========================================================================
     /**
      * @param array $redirectMap
-     * @return null|string
+     * @param string|null $ip
+     * @return string|null
      */
-    private function getSiteFromInfoAndMap(City|Country $countryInfo, $redirectMap)
+    private function getSiteHandleFromRedirectMap(array $redirectMap, ?string $ip = null): ?string
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
@@ -192,8 +185,23 @@ class RedirectService extends Component
                 $criteria[$settings->redirectMapSimpleModeKey] = $criteriaVal;
             }
 
+            $countryInfo = false;
+
             if (\is_array($criteria)) {
                 foreach ($criteria as $criteriaKey => $criteriaVal) {
+
+                    $needsCountryInfo = !in_array($criteriaKey, ['language', 'languageRegion']);
+
+                    if ($needsCountryInfo && $countryInfo === false) {
+                        $countryInfo = GeoMate::$plugin->geo->getCountryInfo($ip);
+                    }
+
+                    if ($needsCountryInfo && !$countryInfo instanceof Country) {
+                        $isApplicable = false;
+                        GeoMate::log("Unable to match \"$criteriaKey\" due to missing or invalid GeoIP2 database", Logger::LEVEL_WARNING);
+                        continue;
+                    }
+
                     switch ($criteriaKey) {
                         case 'country':
                             if (\is_array($criteriaVal)) {
