@@ -63,6 +63,12 @@ accordingly. At the time of writing, the URLs should be (replace `YOUR_LICENSE_K
 'cityDbDownloadUrl' => 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=YOUR_LICENSE_KEY&suffix=tar.gz',
 ```
 
+You can also include the alternative URL which is support CDN, like:
+```
+'countryDbDownloadUrl' => 'https://cdn.jsdelivr.net/npm/geolite2-country@1.0.2/GeoLite2-Country.mmdb.gz',
+'cityDbDownloadUrl'    => 'https://cdn.jsdelivr.net/npm/geolite2-city@1.0.0/GeoLite2-City.mmdb.gz',
+```
+
 _Please note, although this is the recommended approach, you can also just download the files
 manually, or through some other mechanism, and put them in the `dbPath` yourself._  
 
