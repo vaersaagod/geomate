@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 2.1.1 - 2023-03-24  
+### Fixed
+- Fixed a bug that could result in a PHP exception if a site link ended up being `null`. Fixes #58
+
 ## 2.1.0 - 2022-10-04
 ### Changed  
 - Auto-redirects based on browser language now always work, regardless of GeoMate having access to a geolocation database or not. #53  

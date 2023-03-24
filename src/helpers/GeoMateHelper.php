@@ -127,7 +127,7 @@ class GeoMateHelper
         return $r;
     }
 
-    public static function getCurrentLinkForSite(Site $site, bool $elementMatchOnly = false): bool|string
+    public static function getCurrentLinkForSite(Site $site, bool $elementMatchOnly = false): bool|null|string
     {
         // Get the site URL for the found site, this will be the fallback if we're not on an element's url
         $url = $elementMatchOnly ? null : $site->getBaseUrl();
