@@ -1,7 +1,7 @@
 {
     "name": "vaersaagod/geomate",
     "description": "GeoMate is a friend in need for all things geolocation. IP to geo lookup, automatic redirects (based on country, continent, language, etc), site switcher... You name it.",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "type": "craft-plugin",
     "keywords": [
         "craft",

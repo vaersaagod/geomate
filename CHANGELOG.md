@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 2.1.2 - 2024-02-20  
+### Fixed
+- Fixed parsing of config values in settings (fixes #59)
+
 ## 2.1.1 - 2023-03-24  
 ### Fixed
 - Fixed a bug that could result in a PHP exception if a site link ended up being `null`. Fixes #58
