@@ -180,28 +180,26 @@ class Settings extends Model
     // Public Methods
     // =========================================================================
 
-    /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        return [];
-    }
-
     public function init(): void
     {
+        parent::init();
+        $this->parseSettings();
+    }
+    
+    public function setAttributes($values, $safeOnly = true): void
+    {
+        parent::setAttributes($values, $safeOnly);
+        $this->parseSettings();
+    }
+
+    private function parseSettings()
+    {
         if (empty($this->dbPath)) {
-            try {
-                $this->dbPath = Craft::$app->getPath()->getStoragePath() . DIRECTORY_SEPARATOR . 'geomate' . DIRECTORY_SEPARATOR;
-            } catch (Exception) {
-            }
+            $this->dbPath = Craft::$app->getPath()->getStoragePath() . DIRECTORY_SEPARATOR . 'geomate' . DIRECTORY_SEPARATOR;
         }
-        
-        try {
-            $this->cacheDuration = ConfigHelper::durationInSeconds($this->cacheDuration);
-            $this->cookieDuration = ConfigHelper::durationInSeconds($this->cookieDuration);
-        } catch (InvalidConfigException) {
-        }
+
+        $this->cacheDuration = ConfigHelper::durationInSeconds($this->cacheDuration);
+        $this->cookieDuration = ConfigHelper::durationInSeconds($this->cookieDuration);
     }
 
     public function getDbPath(): string
