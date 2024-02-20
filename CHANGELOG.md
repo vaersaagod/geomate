@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 1.3.2 - 2024-02-20
+### Fixed
+- Fixed parsing of config values in settings (fixes #59)
+
 ## 1.3.1.2 - 2021-07-20
 ### Fixed
 - Fixed accidental use of macro from Craft 3.6 (fixes #43).
