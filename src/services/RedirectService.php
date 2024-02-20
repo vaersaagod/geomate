@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate\services;
@@ -38,7 +38,7 @@ class RedirectService extends Component
     public function autoRedirect()
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
 
         $redirectInfo = $this->getRedirectInfo();
 
@@ -61,7 +61,7 @@ class RedirectService extends Component
     public function getRedirectInfo($ip = null, $customMap = null)
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
 
         // Ignore because... crawler?
         if ($settings->redirectIgnoreBots && GeoMateHelper::isCrawler()) {
@@ -84,7 +84,7 @@ class RedirectService extends Component
         $redirectMap = $customMap ?: $settings->redirectMap;
         $isOverridden = false;
 
-        if ($overrideCookie = GeoMate::$plugin->cookie->getOverrideCookie()) {
+        if ($overrideCookie = GeoMate::getInstance()->cookie->getOverrideCookie()) {
             $applicableSite = Craft::$app->getSites()->getSiteByHandle($overrideCookie);
             $isOverridden = true;
         } else {
@@ -137,7 +137,7 @@ class RedirectService extends Component
     public function addOverrideParam($val): string
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         return GeoMateHelper::addUrlParam($val, $settings->redirectOverrideParam, $settings->paramValue);
     }
 
@@ -147,7 +147,7 @@ class RedirectService extends Component
     public function addRedirectParam($val): string
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         return GeoMateHelper::addUrlParam($val, $settings->redirectedParam, $settings->paramValue);
     }
 
@@ -158,7 +158,7 @@ class RedirectService extends Component
     {
         try {
             $currentSite = Craft::$app->getSites()->getCurrentSite();
-            GeoMate::$plugin->cookie->setOverrideCookie($currentSite);
+            GeoMate::getInstance()->cookie->setOverrideCookie($currentSite);
         } catch (SiteNotFoundException) {
         }
     }
@@ -174,7 +174,7 @@ class RedirectService extends Component
     private function getSiteHandleFromRedirectMap(array $redirectMap, ?string $ip = null): ?string
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
 
         foreach ($redirectMap as $siteHandle => $criteria) {
             $isApplicable = true;
@@ -193,7 +193,7 @@ class RedirectService extends Component
                     $needsCountryInfo = !in_array($criteriaKey, ['language', 'languageRegion']);
 
                     if ($needsCountryInfo && $countryInfo === false) {
-                        $countryInfo = GeoMate::$plugin->geo->getCountryInfo($ip);
+                        $countryInfo = GeoMate::getInstance()->geo->getCountryInfo($ip);
                     }
 
                     if ($needsCountryInfo && !$countryInfo instanceof Country) {
@@ -256,7 +256,7 @@ class RedirectService extends Component
     private function shouldIgnoreUser(): bool
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         $user = Craft::$app->getUser()->getIdentity() ?? null;
 
         if ($user) {
@@ -279,7 +279,7 @@ class RedirectService extends Component
     private function shouldIgnoreUrl(): bool
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
 
         try {
             $url = Craft::$app->getRequest()->getUrl();

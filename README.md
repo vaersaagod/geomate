@@ -1,4 +1,4 @@
-# GeoMate plugin for Craft CMS 4.x
+# GeoMate plugin for Craft CMS 5.x
 
 GeoMate is a friend in need for all things geolocation. IP to geo lookup, automatic 
 redirects (based on country, continent, language, etc), site switcher... You name it.  
@@ -8,7 +8,7 @@ redirects (based on country, continent, language, etc), site switcher... You nam
 
 ## Requirements
 
-This plugin requires Craft CMS 4.0.0 or later. The plugin also requires the zlib PHP extension.
+This plugin requires Craft CMS 5.0.0-beta.2 or later. The plugin also requires the zlib PHP extension.
 
 ## IMPORTANT UPDATE
 
@@ -254,7 +254,7 @@ that might get a bit... edge-case:
 ]
 ```
 
-As of 1.0.4, the values in the redirect map can also be arrays:
+The values in the redirect map can also be arrays:
 
 ```
 'redirectMap' => [

@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate\models;
@@ -177,41 +177,34 @@ class Settings extends Model
      */
     public $minimumAcceptLanguageQuality = 80;
 
-    // Public Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        return [];
-    }
-
+    
     public function init(): void
     {
-        if (empty($this->dbPath)) {
-            try {
-                $this->dbPath = Craft::$app->getPath()->getStoragePath() . DIRECTORY_SEPARATOR . 'geomate' . DIRECTORY_SEPARATOR;
-            } catch (Exception) {
-            }
-        }
-        
-        try {
-            $this->cacheDuration = ConfigHelper::durationInSeconds($this->cacheDuration);
-            $this->cookieDuration = ConfigHelper::durationInSeconds($this->cookieDuration);
-        } catch (InvalidConfigException) {
-        }
+        parent::init();
+        $this->parseSettings();
+    }
+    
+    public function setAttributes($values, $safeOnly = true): void
+    {
+        parent::setAttributes($values, $safeOnly);
+        $this->parseSettings();
     }
 
+    private function parseSettings()
+    {
+        if (empty($this->dbPath)) {
+            $this->dbPath = Craft::$app->getPath()->getStoragePath() . DIRECTORY_SEPARATOR . 'geomate' . DIRECTORY_SEPARATOR;
+        }
+
+        $this->cacheDuration = ConfigHelper::durationInSeconds($this->cacheDuration);
+        $this->cookieDuration = ConfigHelper::durationInSeconds($this->cookieDuration);
+    }
+    
     public function getDbPath(): string
     {
         return $this->dbPath;
     }
 
-    /**
-     * @param string $type
-     */
     public function getDbFilePath($type = 'country'): string
     {
         return FileHelper::normalizePath($this->dbPath . DIRECTORY_SEPARATOR . ($type === 'city' ? $this->cityDbFilename : $this->countryDbFilename));

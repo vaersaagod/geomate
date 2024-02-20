@@ -1,4 +1,13 @@
 <?php
+/**
+ * GeoMate plugin for Craft CMS 5.x
+ *
+ * Look up visitors location data based on their IP and easily redirect them to the correct site..
+ *
+ * @link      https://www.vaersaagod.no
+ * @copyright Copyright (c) 2024 Værsågod
+ */
+
 
 namespace vaersaagod\geomate\twigextensions;
 
@@ -32,11 +41,11 @@ class GeoMateTwigExtension extends AbstractExtension
 
     public function addOverrideParam(string $val): string
     {
-        return GeoMate::$plugin->redirect->addOverrideParam($val);
+        return GeoMate::getInstance()->redirect->addOverrideParam($val);
     }
 
     public function addRedirectParam(string $val): string
     {
-        return GeoMate::$plugin->redirect->addRedirectParam($val);
+        return GeoMate::getInstance()->redirect->addRedirectParam($val);
     }
 }
