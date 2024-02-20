@@ -14,6 +14,7 @@ namespace vaersaagod\geomate\services;
 use Craft;
 use craft\base\Component;
 use craft\errors\SiteNotFoundException;
+use craft\helpers\ArrayHelper;
 use vaersaagod\geomate\GeoMate;
 use vaersaagod\geomate\helpers\GeoMateHelper;
 use vaersaagod\geomate\models\RedirectInfo;
@@ -81,6 +82,7 @@ class RedirectService extends Component
         }
         
         $countryInfo = GeoMate::$plugin->geo->getCountryInfo($ip);
+        $cityInfo = GeoMate::$plugin->geo->getCityInfo($ip);
         $needsCountryInfo = !in_array($settings->redirectMapSimpleModeKey, ['language', 'languageRegion']);
 
         if ($countryInfo === null && $needsCountryInfo) {
@@ -95,7 +97,7 @@ class RedirectService extends Component
             $applicableSite = Craft::$app->getSites()->getSiteByHandle($overrideCookie);
             $isOverridden = true;
         } else {
-            $applicableSiteHandle = $this->getSiteFromInfoAndMap($countryInfo, $redirectMap);
+            $applicableSiteHandle = $this->getSiteFromInfoAndMap($countryInfo, $cityInfo, $redirectMap);
 
             if ($applicableSiteHandle === null) {
                 return null;
@@ -182,7 +184,7 @@ class RedirectService extends Component
      * @param array $redirectMap
      * @return null|string
      */
-    private function getSiteFromInfoAndMap($countryInfo, $redirectMap)
+    private function getSiteFromInfoAndMap($countryInfo, $cityInfo, $redirectMap)
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
@@ -205,6 +207,14 @@ class RedirectService extends Component
                                     $isApplicable = false;
                                 }
                             } elseif (strtolower($countryInfo->country->isoCode) !== strtolower($criteriaVal)) {
+                                $isApplicable = false;
+                            }
+                            break;
+                        case 'subdivision': 
+                            $ipSubdivisions = ArrayHelper::getColumn($cityInfo->subdivisions, function($item) {
+                                return strtolower($item->isoCode);
+                            });
+                            if(!\in_array(strtolower($criteriaVal), $ipSubdivisions)) {
                                 $isApplicable = false;
                             }
                             break;
