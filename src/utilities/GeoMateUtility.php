@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate\utilities;
@@ -56,7 +56,15 @@ class GeoMateUtility extends Utility
      */
     public static function badgeCount(): int
     {
-        return GeoMate::$plugin->database->hasDatabase() ? 0 : 1;
+        return GeoMate::getInstance()->database->hasDatabase() ? 0 : 1;
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public static function icon(): ?string
+    {
+        return 'globe';
     }
 
     /**
@@ -65,7 +73,7 @@ class GeoMateUtility extends Utility
     public static function contentHtml(): string
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         
         try {
             Craft::$app->getView()->registerAssetBundle(GeoMateAssets::class);
@@ -76,8 +84,8 @@ class GeoMateUtility extends Utility
         return Craft::$app->getView()->renderTemplate(
             'geomate/utility/_render',
             [
-                'hasDatabase' => GeoMate::$plugin->database->hasDatabase(),
-                'dbTimestamp' => GeoMate::$plugin->database->getDatabaseTimestamp(),
+                'hasDatabase' => GeoMate::getInstance()->database->hasDatabase(),
+                'dbTimestamp' => GeoMate::getInstance()->database->getDatabaseTimestamp(),
                 'settings' => $settings,
                 'memoryLimit' => ini_get('memory_limit'),
             ]

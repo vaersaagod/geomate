@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site.
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate\console\controllers;
@@ -24,7 +24,7 @@ class DatabaseController extends Controller
     {
         $this->stdout("Updating databases...\n");
 
-        GeoMate::$plugin->database->updateDatabase();
+        GeoMate::getInstance()->database->updateDatabase();
         return ExitCode::OK;
     }
 }

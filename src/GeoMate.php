@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site.
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate;
@@ -16,6 +16,7 @@ use craft\base\Plugin;
 use craft\errors\MissingComponentException;
 use craft\errors\SiteNotFoundException;
 use craft\events\RegisterComponentTypesEvent;
+use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
@@ -52,6 +53,7 @@ class GeoMate extends Plugin
 
     /**
      * @var GeoMate
+     * @deprecated in 3.0. `getInstance()` should be used instead
      */
     public static GeoMate $plugin;
 
@@ -77,6 +79,8 @@ class GeoMate extends Plugin
     public function init(): void
     {
         parent::init();
+        
+        // Deprecated, but keeping this around until 4.0 in case someone relies on it.
         self::$plugin = $this;
 
         /** @var Settings $settings */
@@ -92,22 +96,17 @@ class GeoMate extends Plugin
 
         // Create a separate log file for GeoMate to keep things sane
         if ($settings->useSeparateLogfile) {
-            // TODO 4.0: Need to replace this with... monolog?
-            /*
-            $fileTarget = new \craft\log\FileTarget([
-                'logFile' => Craft::$app->getPath()->getLogPath(true) . '/geomate.log',
-                'categories' => ['geomate']
+            // Custom log target
+            // Register a custom log target, keeping the format as simple as possible.
+            Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+                'name' => 'geomate',
+                'categories' => ['geomate', 'vaersaagod\\geomate\\*'],
+                'allowLineBreaks' => true,
             ]);
-
-            Craft::getLogger()->dispatcher->targets[] = $fileTarget;
-            */
         }
 
         // Add template variable
-        Event::on(
-            CraftVariable::class,
-            CraftVariable::EVENT_INIT,
-            static function(Event $event) {
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, static function(Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('geomate', GeoMateVariable::class);
@@ -115,7 +114,7 @@ class GeoMate extends Plugin
         );
 
         // Add utility
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $event) {
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITIES, function(RegisterComponentTypesEvent $event) {
             $event->types[] = GeoMateUtility::class;
         });
 
@@ -135,7 +134,7 @@ class GeoMate extends Plugin
     public static function log($message, $logLevel = Logger::LEVEL_INFO)
     {
         /** @var Settings $settings */
-        $settings = self::$plugin->getSettings();
+        $settings = self::getInstance()->getSettings();
 
         if ($settings->useSeparateLogfile) {
             if ($logLevel <= $settings->logLevel || Craft::$app->getConfig()->getGeneral()->devMode) {
@@ -153,9 +152,8 @@ class GeoMate extends Plugin
      * @throws SiteNotFoundException
      * @throws BadRequestHttpException
      */
-    protected function redirectCheck()
+    protected function redirectCheck(): void
     {
-
         /** @var Settings $settings */
         $settings = $this->getSettings();
         

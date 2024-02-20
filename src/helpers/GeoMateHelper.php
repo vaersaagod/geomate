@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate\helpers;
@@ -38,14 +38,14 @@ class GeoMateHelper
     public static function isRedirected(): bool
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         return GeoMate::$isRedirected || (Craft::$app->getRequest()->getParam($settings->redirectedParam, '') !== '');
     }
 
     public static function isOverridden(): bool
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         return Craft::$app->getRequest()->getParam($settings->redirectOverrideParam, '') !== '';
     }
 

@@ -1,11 +1,11 @@
 <?php
 /**
- * GeoMate plugin for Craft CMS 4.x
+ * GeoMate plugin for Craft CMS 5.x
  *
  * Look up visitors location data based on their IP and easily redirect them to the correct site..
  *
  * @link      https://www.vaersaagod.no
- * @copyright Copyright (c) 2022 Værsågod
+ * @copyright Copyright (c) 2024 Værsågod
  */
 
 namespace vaersaagod\geomate\services;
@@ -51,7 +51,7 @@ class DatabaseService extends Component
         GeoMate::log('Updating database ' . $type, Logger::LEVEL_INFO);
 
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         $dbPath = $settings->getDbPath();
         $tempPath = $settings->getTempPath();
 
@@ -129,7 +129,7 @@ class DatabaseService extends Component
     public function hasDatabase(): bool
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         $dbPath = $settings->getDbPath();
         $countryPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->countryDbFilename);
         $cityPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->cityDbFilename);
@@ -144,7 +144,7 @@ class DatabaseService extends Component
     public function getDatabaseTimestamp()
     {
         /** @var Settings $settings */
-        $settings = GeoMate::$plugin->getSettings();
+        $settings = GeoMate::getInstance()->getSettings();
         $dbPath = $settings->getDbPath();
         $countryPath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $settings->countryDbFilename);
 
