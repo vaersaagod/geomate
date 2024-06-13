@@ -123,9 +123,9 @@ class GeoMate extends Plugin
         Craft::$app->view->registerTwigExtension(new GeoMateTwigExtension());
 
         // Handle redirect functionality
-        Craft::$app->on(Application::EVENT_INIT, function() {
+        Event::on(Application::class, Application::EVENT_INIT, function() {
             $this->redirectCheck();
-        }, null, false);
+        }, append: false);
     }
 
     /**

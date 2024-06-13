@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## Unreleased
+### Fixed
+- Fixed an issue where GeoMate could prevent custom user behaviors from being registered. [#60](https://github.com/vaersaagod/geomate/issues/60)
+
 ## 2.1.2 - 2024-02-20  
 ### Fixed
 - Fixed parsing of config values in settings (fixes #59)
