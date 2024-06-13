@@ -1,6 +1,6 @@
 # GeoMate Changelog
 
-## Unreleased
+## 2.1.3 - 2024-06-13
 ### Fixed
 - Fixed an issue where GeoMate could prevent custom user behaviors from being registered. [#60](https://github.com/vaersaagod/geomate/issues/60)
 
