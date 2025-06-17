@@ -20,18 +20,22 @@ use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
+
+use Monolog\Formatter\LineFormatter;
+
+use Psr\Log\LogLevel;
+
 use vaersaagod\geomate\models\Settings;
 use vaersaagod\geomate\services\CookieService;
-
 use vaersaagod\geomate\services\DatabaseService;
 use vaersaagod\geomate\services\GeoService;
 use vaersaagod\geomate\services\RedirectService;
 use vaersaagod\geomate\twigextensions\GeoMateTwigExtension;
 use vaersaagod\geomate\utilities\GeoMateUtility;
 use vaersaagod\geomate\variables\GeoMateVariable;
+
 use yii\base\Event;
 use yii\log\Logger;
-
 use yii\web\BadRequestHttpException;
 
 /**
@@ -94,14 +98,18 @@ class GeoMate extends Plugin
             'cookie' => CookieService::class,
         ]);
 
-        // Create a separate log file for GeoMate to keep things sane
+        // Create a separate log file for GeoMate?
         if ($settings->useSeparateLogfile) {
-            // Custom log target
-            // Register a custom log target, keeping the format as simple as possible.
             Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
                 'name' => 'geomate',
                 'categories' => ['geomate', 'vaersaagod\\geomate\\*'],
-                'allowLineBreaks' => true,
+                'level' => LogLevel::INFO,
+                'logContext' => false,
+                'allowLineBreaks' => false,
+                'formatter' => new LineFormatter(
+                    format: "[%datetime%] %message%\n",
+                    dateFormat: 'Y-m-d H:i:s',
+                ),
             ]);
         }
 

@@ -41,7 +41,6 @@ class RedirectService extends Component
     {
         $redirectInfo = $this->getRedirectInfo();
         if (empty($redirectInfo)) {
-            GeoMate::log('Not auto-redirecting because redirect info is null.', Logger::LEVEL_INFO);
             return;
         }
 
