@@ -324,9 +324,10 @@ Example:
 Name of the cookie that registers if a user has overridden the preferred site (via a site switcher 
 for instance).
 
-### cookieDuration [int]
+### cookieDuration [int|string]
 *Default: `43200`*  
-Duration of the cookies. 
+Duration of the cookies. Can be set to an integer or a valid PHP DateInterval string (e.g. `P1D`).  
+Setting the `cookieDuration` to `0` will create a session cookie.
 
 ### addGetParameterOnRedirect [bool]
 *Default: `false`*  
