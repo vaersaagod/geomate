@@ -16,9 +16,15 @@ use craft\base\Plugin;
 use craft\errors\MissingComponentException;
 use craft\errors\SiteNotFoundException;
 use craft\events\RegisterComponentTypesEvent;
+use craft\helpers\App;
+use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
+use Monolog\Formatter\LineFormatter;
+
+use Psr\Log\LogLevel;
+
 use vaersaagod\geomate\models\Settings;
 use vaersaagod\geomate\services\CookieService;
 
@@ -28,7 +34,9 @@ use vaersaagod\geomate\services\RedirectService;
 use vaersaagod\geomate\twigextensions\GeoMateTwigExtension;
 use vaersaagod\geomate\utilities\GeoMateUtility;
 use vaersaagod\geomate\variables\GeoMateVariable;
+
 use yii\base\Event;
+use yii\log\Dispatcher;
 use yii\log\Logger;
 
 use yii\web\BadRequestHttpException;
@@ -90,17 +98,19 @@ class GeoMate extends Plugin
             'cookie' => CookieService::class,
         ]);
 
-        // Create a separate log file for GeoMate to keep things sane
-        if ($settings->useSeparateLogfile) {
-            // TODO 4.0: Need to replace this with... monolog?
-            /*
-            $fileTarget = new \craft\log\FileTarget([
-                'logFile' => Craft::$app->getPath()->getLogPath(true) . '/geomate.log',
-                'categories' => ['geomate']
+        // Create a separate log file for GeoMate?
+        if ($settings->useSeparateLogfile && Craft::getLogger()->dispatcher instanceof Dispatcher) {
+            Craft::getLogger()->dispatcher->targets['geomate'] = new MonologTarget([
+                'name' => 'geomate',
+                'categories' => ['geomate'],
+                'level' => LogLevel::INFO,
+                'logContext' => false,
+                'allowLineBreaks' => false,
+                'formatter' => new LineFormatter(
+                    format: "[%datetime%] %message%\n",
+                    dateFormat: 'Y-m-d H:i:s',
+                ),
             ]);
-
-            Craft::getLogger()->dispatcher->targets[] = $fileTarget;
-            */
         }
 
         // Add template variable
@@ -126,6 +136,9 @@ class GeoMate extends Plugin
         Event::on(Application::class, Application::EVENT_INIT, function() {
             $this->redirectCheck();
         }, append: false);
+
+        GeoMate::getInstance()->log('Hi mom');
+        GeoMate::getInstance()->log('Hi error', Logger::LEVEL_ERROR);
     }
 
     /**
@@ -138,7 +151,7 @@ class GeoMate extends Plugin
         $settings = self::$plugin->getSettings();
 
         if ($settings->useSeparateLogfile) {
-            if ($logLevel <= $settings->logLevel || Craft::$app->getConfig()->getGeneral()->devMode) {
+            if ($logLevel <= $settings->logLevel || App::devMode()) {
                 Craft::getLogger()->log($message, $logLevel, 'geomate');
             }
         } else {
