@@ -7,7 +7,7 @@ redirects (based on country, continent, language, etc), site switcher... You nam
 
 ## Requirements
 
-This plugin requires Craft CMS 5.0.0-beta.2 or later. The plugin also requires the zlib PHP extension.  
+This plugin requires Craft CMS 5.0 or later. The plugin also requires the zlib PHP extension.  
 
 ### ⚠️ GeoMate and static caching
 
