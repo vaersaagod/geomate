@@ -8,7 +8,15 @@ redirects (based on country, continent, language, etc), site switcher... You nam
 
 ## Requirements
 
-This plugin requires Craft CMS 4.0.0 or later. The plugin also requires the zlib PHP extension.
+This plugin requires Craft CMS 4.0 or later. The plugin also requires the zlib PHP extension.  
+
+### ⚠️ GeoMate and static caching
+
+GeoMate relies on dynamic geolocation and IP-based logic in PHP, which makes the plugin generally incompatible with statically cached sites (e.g. those using full-page caching via Cloudflare, Craft Cloud, Servd and similar).
+
+### ⚠️ GeoMate and Craft Cloud
+
+GeoMate relies on a self-hosted IP geolocation database from MaxMind, which must be downloaded and stored locally. This makes it a bad fit for Craft Cloud or other hosting environments with ephemeral storage (e.g. serverless platforms or auto-scaling containers), where local files may be lost between requests or deployments.
 
 ## IMPORTANT UPDATE
 
