@@ -32,7 +32,7 @@ class CookieService extends Component
     {
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
-        $this->setCookie($settings->redirectOverrideCookieName, $site->handle, time() + $settings->cookieDuration);
+        $this->setCookie($settings->redirectOverrideCookieName, $site->handle, empty($settings->cookieDuration) ? 0 : $settings->cookieDuration + time());
     }
 
     /**
