@@ -13,12 +13,14 @@ namespace vaersaagod\geomate\services;
 use Craft;
 use craft\base\Component;
 use craft\errors\SiteNotFoundException;
-use GeoIp2\Model\City;
+
 use GeoIp2\Model\Country;
+
 use vaersaagod\geomate\GeoMate;
 use vaersaagod\geomate\helpers\GeoMateHelper;
 use vaersaagod\geomate\models\RedirectInfo;
 use vaersaagod\geomate\models\Settings;
+
 use yii\base\InvalidConfigException;
 use yii\log\Logger;
 
@@ -37,20 +39,23 @@ class RedirectService extends Component
      */
     public function autoRedirect()
     {
+        $redirectInfo = $this->getRedirectInfo();
+        if (empty($redirectInfo)) {
+            GeoMate::log('Not auto-redirecting because redirect info is null.', Logger::LEVEL_INFO);
+            return;
+        }
+
         /** @var Settings $settings */
         $settings = GeoMate::$plugin->getSettings();
-
-        $redirectInfo = $this->getRedirectInfo();
-
-        if ($redirectInfo !== null) {
-            Craft::$app->getSession()->setFlash('geomateIsRedirected', true);
-            
-            Craft::$app->getResponse()->redirect(
-                $settings->addGetParameterOnRedirect ?
-                    GeoMateHelper::addUrlParam($redirectInfo->url, $settings->redirectedParam, $settings->paramValue) :
-                    $redirectInfo->url
-            );
+        if (!$settings->addGetParameterOnRedirect) {
+            Craft::$app->getSession()->setFlash('geomateIsRedirected');
         }
+
+        Craft::$app->getResponse()->redirect(
+            $settings->addGetParameterOnRedirect ?
+                GeoMateHelper::addUrlParam($redirectInfo->url, $settings->redirectedParam, $settings->paramValue) :
+                $redirectInfo->url
+        );
     }
 
     /**
