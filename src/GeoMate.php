@@ -148,34 +148,43 @@ class GeoMate extends Plugin
     // Protected Methods
     // =========================================================================
     /**
+     * @return void
+     * @throws BadRequestHttpException
      * @throws MissingComponentException
      * @throws SiteNotFoundException
-     * @throws BadRequestHttpException
+     * @throws \yii\base\InvalidRouteException
      */
     protected function redirectCheck(): void
     {
-        /** @var Settings $settings */
-        $settings = $this->getSettings();
-        
         $request = Craft::$app->getRequest();
-
-        if ($request->getIsConsoleRequest() || !$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsPreview() || (bool)Craft::$app->getRequest()->getToken() || $request->getIsLivePreview()) {
+        if ($request->getIsConsoleRequest() || !$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsPreview() || Craft::$app->getRequest()->getHadToken() || $request->getIsLivePreview()) {
             return;
         }
 
-        $session = Craft::$app->getSession();
+        /** @var Settings $settings */
+        $settings = $this->getSettings();
 
-        if ($session->hasFlash('geomateIsRedirected') || $request->getParam($settings->redirectedParam, null)) {
-            self::$isRedirected = true;
-        }
-
-        if ($request->getParam($settings->redirectOverrideParam, null)) {
+        $redirectOverrideParam = $request->getParam($settings->redirectOverrideParam);
+        if (!empty($redirectOverrideParam) && $redirectOverrideParam === $settings->paramValue) {
             $this->redirect->registerOverride();
         }
 
-        if ($settings->autoRedirectEnabled && !in_array(Craft::$app->getSites()->getCurrentSite()->handle, $settings->autoRedirectExclude, true)) {
-            $this->redirect->autoRedirect();
+        if (!$settings->autoRedirectEnabled || in_array(Craft::$app->getSites()->getCurrentSite()->handle, $settings->autoRedirectExclude, true)) {
+            return;
         }
+
+        if ($settings->addGetParameterOnRedirect) {
+            $redirectedParam = $request->getParam($settings->redirectedParam);
+            self::$isRedirected = !empty($redirectedParam) && $redirectedParam === $settings->paramValue;
+        } else {
+            self::$isRedirected = Craft::$app->getSession()->hasFlash('geomateIsRedirected');
+        }
+
+        if (self::$isRedirected) {
+            return;
+        }
+
+        $this->redirect->autoRedirect();
     }
 
     /**

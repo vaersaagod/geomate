@@ -33,24 +33,29 @@ class RedirectService extends Component
     // =========================================================================
 
     /**
-     *
+     * @return void
+     * @throws \craft\errors\MissingComponentException
+     * @throws \yii\base\InvalidRouteException
      */
     public function autoRedirect()
     {
+        $redirectInfo = $this->getRedirectInfo();
+        if (empty($redirectInfo)) {
+            GeoMate::log('Not auto-redirecting because redirect info is null.', Logger::LEVEL_INFO);
+            return;
+        }
+
         /** @var Settings $settings */
         $settings = GeoMate::getInstance()->getSettings();
-
-        $redirectInfo = $this->getRedirectInfo();
-
-        if ($redirectInfo !== null) {
-            Craft::$app->getSession()->setFlash('geomateIsRedirected', true);
-            
-            Craft::$app->getResponse()->redirect(
-                $settings->addGetParameterOnRedirect ?
-                    GeoMateHelper::addUrlParam($redirectInfo->url, $settings->redirectedParam, $settings->paramValue) :
-                    $redirectInfo->url
-            );
+        if (!$settings->addGetParameterOnRedirect) {
+            Craft::$app->getSession()->setFlash('geomateIsRedirected');
         }
+
+        Craft::$app->getResponse()->redirect(
+            $settings->addGetParameterOnRedirect ?
+                GeoMateHelper::addUrlParam($redirectInfo->url, $settings->redirectedParam, $settings->paramValue) :
+                $redirectInfo->url
+        );
     }
 
     /**
