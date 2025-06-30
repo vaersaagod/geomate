@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 2.2.1 - 2025-06-30
+### Fixed
+- Removed some debug log messages left in by accident 🙃
+
 ## 2.2.0 - 2025-06-17
 ### Fixed
 - Fixed a bug where the `useSeparateLogfile` setting didn't, in fact, make GeoMate write logs to its own file. [#66](https://github.com/vaersaagod/geomate/issues/66)

@@ -136,9 +136,6 @@ class GeoMate extends Plugin
         Event::on(Application::class, Application::EVENT_INIT, function() {
             $this->redirectCheck();
         }, append: false);
-
-        GeoMate::getInstance()->log('Hi mom');
-        GeoMate::getInstance()->log('Hi error', Logger::LEVEL_ERROR);
     }
 
     /**
