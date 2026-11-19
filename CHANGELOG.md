@@ -1,5 +1,9 @@
 # GeoMate Changelog
 
+## 3.1.1 - 2026-11-19 
+### Fixed
+- Fixed an issue where the redirect included the whole page response.
+
 ## 3.1.0 - 2025-06-17 
 ### Fixed
 - Fixed a bug where the `useSeparateLogfile` setting didn't, in fact, make GeoMate write logs to its own file. [#66](https://github.com/vaersaagod/geomate/issues/66)
