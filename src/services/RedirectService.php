@@ -55,6 +55,12 @@ class RedirectService extends Component
                 GeoMateHelper::addUrlParam($redirectInfo->url, $settings->redirectedParam, $settings->paramValue) :
                 $redirectInfo->url
         );
+        
+        try {
+            Craft::$app->end();
+        } catch (\Throwable $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+        }
     }
 
     /**
