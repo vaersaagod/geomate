@@ -87,8 +87,67 @@ class GeoMateUtility extends Utility
                 'hasDatabase' => GeoMate::getInstance()->database->hasDatabase(),
                 'dbTimestamp' => GeoMate::getInstance()->database->getDatabaseTimestamp(),
                 'settings' => $settings,
+                'countryDbDownloadUrl' => self::redactUrl($settings->countryDbDownloadUrl),
+                'cityDbDownloadUrl' => self::redactUrl($settings->cityDbDownloadUrl),
                 'memoryLimit' => ini_get('memory_limit'),
             ]
         );
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Returns a display-safe version of a download URL, with any credentials (userinfo, and
+     * sensitive query values like license_key) redacted.
+     *
+     * @param string|null $url
+     * @return string|null
+     */
+    private static function redactUrl(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return $url;
+        }
+
+        $parts = parse_url($url);
+
+        if ($parts === false || !isset($parts['host'])) {
+            return str_repeat('•', 8);
+        }
+
+        $security = Craft::$app->getSecurity();
+
+        $redacted = ($parts['scheme'] ?? 'https') . '://';
+
+        if (isset($parts['user'])) {
+            $redacted .= str_repeat('•', 8) . '@';
+        }
+
+        $redacted .= $parts['host'];
+
+        if (isset($parts['port'])) {
+            $redacted .= ':' . $parts['port'];
+        }
+
+        $redacted .= $parts['path'] ?? '';
+
+        if (isset($parts['query']) && $parts['query'] !== '') {
+            $pairs = [];
+
+            foreach (explode('&', $parts['query']) as $pair) {
+                if (!str_contains($pair, '=')) {
+                    $pairs[] = $pair;
+                    continue;
+                }
+
+                [$key, $value] = explode('=', $pair, 2);
+                $pairs[] = $key . '=' . $security->redactIfSensitive(urldecode($key), $value);
+            }
+
+            $redacted .= '?' . implode('&', $pairs);
+        }
+
+        return $redacted;
     }
 }
