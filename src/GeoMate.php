@@ -169,6 +169,11 @@ class GeoMate extends Plugin
             return;
         }
 
+        // Resource requests (published CP/asset bundle files served by PHP) are not page views
+        if ($this->isResourceRequest()) {
+            return;
+        }
+
         /** @var Settings $settings */
         $settings = $this->getSettings();
 
@@ -201,5 +206,34 @@ class GeoMate extends Plugin
     protected function createSettingsModel(): ?Model
     {
         return new Settings();
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Whether the current request is for a published resource (resourceBaseUrl, `/cpresources` by default).
+     * Craft serves these through PHP when the file isn't published to the webroot, after EVENT_INIT.
+     * Uses the same test as Craft's own resource request handling.
+     *
+     * @return bool
+     */
+    private function isResourceRequest(): bool
+    {
+        $resourceBaseUrl = Craft::getAlias(Craft::$app->getConfig()->getGeneral()->resourceBaseUrl, false);
+
+        if (!is_string($resourceBaseUrl)) {
+            return false;
+        }
+
+        $resourceBaseUri = parse_url($resourceBaseUrl, PHP_URL_PATH);
+
+        if (!is_string($resourceBaseUri) || trim($resourceBaseUri, '/') === '') {
+            return false;
+        }
+
+        $resourceBaseUri = '/' . trim($resourceBaseUri, '/');
+
+        return str_starts_with('/' . Craft::$app->getRequest()->getFullPath() . '/', $resourceBaseUri . '/');
     }
 }
