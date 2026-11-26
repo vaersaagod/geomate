@@ -12,7 +12,6 @@ namespace vaersaagod\geomate\helpers;
 
 use Craft;
 use craft\base\Element;
-use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
@@ -129,22 +128,24 @@ class GeoMateHelper
 
     public static function getCurrentLinkForSite(Site $site, bool $elementMatchOnly = false): bool|null|string
     {
-        // Get the site URL for the found site, this will be the fallback if we're not on an element's url
+        // Get the site URL for the found site, this will be the fallback if we're not on an element's url.
+        // Site::getBaseUrl() already resolves environment variables and aliases in the base URL.
         $url = $elementMatchOnly ? null : $site->getBaseUrl();
-        
+
         // Check if we're on an element's url, then prefer to redirect to that url
         /** @var Element $currentElement */
         $currentElement = Craft::$app->getUrlManager()->getMatchedElement();
-        
+
         if ($currentElement && $currentElement->getUrl() !== null && $currentElement->getUrl() !== '') {
             $redirectElement = Craft::$app->getElements()->getElementById($currentElement->getId(), $currentElement::class, $site->id);
 
             if ($redirectElement && $redirectElement->enabled && $redirectElement->getEnabledForSite($site->id) && (method_exists($redirectElement, 'getUrl') && $redirectElement->getUrl() !== null && $redirectElement->getUrl() !== '')) {
-                $url = $redirectElement->url;
+                // Element URLs are returned exactly as Craft builds them, they should not be parsed for environment variables
+                $url = $redirectElement->getUrl();
             }
         }
-        
-        return App::parseEnv($url);
+
+        return $url;
     }
 
     public static function addUrlParam(string $url, string $param, string $value): string
