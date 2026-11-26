@@ -366,7 +366,7 @@ Name of the cookie that registers if a user has overridden the preferred site (v
 for instance).
 
 ### cookieDuration [int|string]
-*Default: `43200`*  
+*Default: `'P7D'`*  
 Duration of the cookies. Can be set to an integer or a valid PHP DateInterval string (e.g. `P1D`).  
 Setting the `cookieDuration` to `0` will create a session cookie.
 
@@ -415,7 +415,7 @@ for GeoMate to consider it a valid language.
 
 ### craft.geomate.country([ip=null])
 Returns country information in the form of a `\GeoIp2\Model\Country` model. If no information is 
-found, `null` will be returned.
+found, or the given IP address isn't valid, `null` will be returned.
 
 _By default the IP address of the current request will be used, but you can also use the optional ip 
 parameter to get information based on a specific IP._
@@ -428,7 +428,7 @@ parameter to get information based on a specific IP._
 
 ### craft.geomate.city([ip=null])
 Returns country information in the form of a `\GeoIp2\Model\City` model. If no information is 
-found, `null` will be returned.
+found, or the given IP address isn't valid, `null` will be returned.
 
 _By default the IP address of the current request will be used, but you can also use the optional ip 
 parameter to get information based on a specific IP._

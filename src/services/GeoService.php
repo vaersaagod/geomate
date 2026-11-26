@@ -250,7 +250,15 @@ class GeoService extends Component
         $localIps = array('127.0.0.1', '::1');
 
         if ($ip !== null) {
-            return $ip;
+            // An invalid IP (for instance from a template) makes the database reader throw, so it gets no result instead
+            $validIp = filter_var($ip, FILTER_VALIDATE_IP);
+
+            if ($validIp === false) {
+                GeoMate::log('An IP address that isn\'t valid was passed to GeoMate, and no lookup was made.', Logger::LEVEL_WARNING);
+                return null;
+            }
+
+            return $validIp;
         }
 
         if ($settings->forceIp !== null && filter_var($settings->forceIp, FILTER_VALIDATE_IP)) {
