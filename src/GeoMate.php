@@ -190,7 +190,11 @@ class GeoMate extends Plugin
             $redirectedParam = $request->getQueryParam($settings->redirectedParam);
             self::$isRedirected = !empty($redirectedParam) && $redirectedParam === $settings->paramValue;
         } else {
-            self::$isRedirected = Craft::$app->getSession()->hasFlash('geomateIsRedirected');
+            // Reading the flash starts a session, so only do it when the visitor already has one.
+            // Without a session ID there can be no redirect flash, and starting a session here would
+            // set a session cookie on every page view (bots and visitors that are never redirected).
+            $session = Craft::$app->getSession();
+            self::$isRedirected = ($session->getIsActive() || $session->getHasSessionId()) && $session->hasFlash('geomateIsRedirected');
         }
 
         if (self::$isRedirected) {
