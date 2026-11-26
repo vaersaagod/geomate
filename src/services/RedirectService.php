@@ -50,6 +50,9 @@ class RedirectService extends Component
             Craft::$app->getSession()->setFlash('geomateIsRedirected');
         }
 
+        // The redirect depends on the visitor (location, language, cookies), so it must never be stored by a shared cache
+        Craft::$app->getResponse()->setNoCacheHeaders();
+
         Craft::$app->getResponse()->redirect(
             $settings->addGetParameterOnRedirect ?
                 GeoMateHelper::addUrlParam($redirectInfo->url, $settings->redirectedParam, $settings->paramValue) :
@@ -169,6 +172,9 @@ class RedirectService extends Component
         try {
             $currentSite = Craft::$app->getSites()->getCurrentSite();
             GeoMate::getInstance()->cookie->setOverrideCookie($currentSite);
+
+            // The response sets a visitor-specific cookie, so it must never be stored by a shared cache
+            Craft::$app->getResponse()->setNoCacheHeaders();
         } catch (SiteNotFoundException) {
         }
     }
