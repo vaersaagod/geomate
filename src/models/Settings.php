@@ -84,6 +84,15 @@ class Settings extends Model
     public $downloadDbIfMissing = false;
 
     /**
+     * Secret key for updating the databases through the `geomate/database/update-database` action URL.
+     * When set, requests to the action URL must include it, either as a `geomateKey` query parameter
+     * or an `X-GeoMate-Key` header. Supports environment variables.
+     *
+     * @var string|null
+     */
+    public $updateDatabaseKey;
+
+    /**
      * @var boolean
      */
     public $autoRedirectEnabled = false;

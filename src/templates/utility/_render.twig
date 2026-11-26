@@ -82,12 +82,22 @@
     
         <div class="geomate-utility__cron geomate-utility__block">
             <h2>Updating the database via action URL or console command</h2>
-            <p>You can also update the database accessing the controller action URL or console command, for instance via a cron job.</p>
+            <p>You can also update the database with the console command or the controller action URL, for instance via a cron job. The console command is recommended.</p>
 
             <p>
-                <strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database') }}</code><br>
-                <strong>Console command:</strong> <code>php {{ alias('@root') }}/craft geomate/database/update-database</code>
+                <strong>Console command:</strong> <code>php {{ alias('@root') }}/craft geomate/database/update-database</code><br>
+                {% if settings.updateDatabaseKey %}
+                    <strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database', { geomateKey: 'YOUR_UPDATE_KEY' }) }}</code>
+                {% else %}
+                    <strong>Action URL:</strong> <code>{{ actionUrl('geomate/database/update-database') }}</code>
+                {% endif %}
             </p>
+
+            {% if settings.updateDatabaseKey %}
+                <p class="light">Replace <code>YOUR_UPDATE_KEY</code> with the value of the <code>updateDatabaseKey</code> config setting. Requests to the action URL without a valid key are refused.</p>
+            {% else %}
+                <p class="light">Requests to the action URL only download new databases when the installed ones are missing or more than six hours old, at most once every ten minutes. Set the <code>updateDatabaseKey</code> config setting to require a key instead.</p>
+            {% endif %}
             
             {#
                 When bumping the requirements to 3.6, we can do:

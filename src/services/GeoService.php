@@ -32,11 +32,6 @@ class GeoService extends Component
     // =========================================================================
 
     /**
-     * Name of the mutex that serializes automatic database downloads
-     */
-    private const DOWNLOAD_MUTEX_NAME = 'geomate-db-download';
-
-    /**
      * Cache key that marks a recently failed automatic database download
      */
     private const DOWNLOAD_BACKOFF_CACHE_KEY = 'geomate-db-download-backoff';
@@ -185,7 +180,7 @@ class GeoService extends Component
 
         $mutex = Craft::$app->getMutex();
 
-        if (!$mutex->acquire(self::DOWNLOAD_MUTEX_NAME)) {
+        if (!$mutex->acquire(DatabaseService::DOWNLOAD_MUTEX_NAME)) {
             return;
         }
 
@@ -198,7 +193,7 @@ class GeoService extends Component
             // Only log the exception class and code, the message can contain the download URL
             GeoMate::log('Automatic database download failed (' . get_class($throwable) . ', code ' . $throwable->getCode() . ')', Logger::LEVEL_ERROR);
         } finally {
-            $mutex->release(self::DOWNLOAD_MUTEX_NAME);
+            $mutex->release(DatabaseService::DOWNLOAD_MUTEX_NAME);
         }
 
         if (!file_exists($dbPath)) {

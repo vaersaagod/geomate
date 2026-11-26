@@ -19,13 +19,21 @@ $(document).ready(function () {
             $updateSpinner.removeClass('invisible');
             $updateStatus.text('Updating...');
 
-            var jqxhr = $.get(url).done(function (result) {
+            var data = {};
+
+            if (Craft.csrfTokenName) {
+                data[Craft.csrfTokenName] = Craft.csrfTokenValue;
+            }
+
+            var jqxhr = $.post(url, data).done(function (result) {
                 if (result && result.success) {
                     $updateStatus.text('Database updated successfully');
     
                     if ($errorHolder.length > 0) {
                         updateErrorHolder();
                     }
+                } else if (result && result.skipped === 'running') {
+                    $updateStatus.text('A database update is already running. Please try again in a moment.');
                 } else {
                     $updateStatus.text('An error occurred! Please check your settings and try again.');
                 }

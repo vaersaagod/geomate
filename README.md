@@ -77,9 +77,20 @@ GeoMate comes with a handy utility that helps you download the database. You can
 access it by going to Utilities > GeoMate from the control panel main menu. Please check that the 
 settings is as desired, and download the databases by clicking the "Update now" button.
 
-You can also download the database by accessing the `geomate/database/update-database` controller 
-action directly, or set up a cron job that hits it at regular intervals. The action URL for your 
-installation is shown in the utility.
+To keep the database up to date, set up a cron job that runs the console command at regular 
+intervals (recommended):
+
+```
+php craft geomate/database/update-database
+```
+
+You can also use the `geomate/database/update-database` controller action URL, for instance from 
+a cron job. The action URL for your installation is shown in the utility. Requests to the action 
+URL only download new databases when the installed ones are missing or more than six hours old, 
+and at most once every ten minutes. To require a secret key for the action URL, set the 
+[`updateDatabaseKey`](#updatedatabasekey-stringnull) config setting and add the key to the URL as 
+a `geomateKey` query parameter (or send it in an `X-GeoMate-Key` header). Requests with a valid 
+key always download.
 
 ---
 
@@ -161,6 +172,24 @@ if it is missing.
 Make sure you're certain that download works before enabling this. If something goes 
 wrong during the download, GeoMate logs the error, the lookup returns no result (so no 
 redirect or redirect information), and GeoMate waits 10 minutes before trying to download again.  
+
+### updateDatabaseKey [string|null]
+*Default: `null`*  
+Secret key for updating the databases through the `geomate/database/update-database` action URL. 
+When set, requests to the action URL must include the key as a `geomateKey` query parameter, or 
+in an `X-GeoMate-Key` header, and requests without a valid key are refused. Requests with a valid 
+key always download new databases. Supports environment variables. Example:
+
+```
+'updateDatabaseKey' => '$GEOMATE_UPDATE_KEY',
+```
+
+```
+https://example.com/actions/geomate/database/update-database?geomateKey=your-secret-key
+```
+
+When not set, requests to the action URL only download new databases when the installed ones are 
+missing or more than six hours old, and at most once every ten minutes.
 
 ### autoRedirectEnabled [bool]
 *Default: `false`*  

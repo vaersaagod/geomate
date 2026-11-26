@@ -27,6 +27,15 @@ use yii\log\Logger;
  */
 class DatabaseService extends Component
 {
+    // Const Properties
+    // =========================================================================
+
+    /**
+     * Name of the mutex that serializes web-triggered database downloads
+     * (the update action and automatic downloads when a database is missing)
+     */
+    public const DOWNLOAD_MUTEX_NAME = 'geomate-db-download';
+
     // Public Methods
     // =========================================================================
 
