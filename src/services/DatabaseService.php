@@ -86,6 +86,11 @@ class DatabaseService extends Component
         $url = $type === 'city' ? $settings->cityDbDownloadUrl : $settings->countryDbDownloadUrl;
         $filename = $type === 'city' ? $settings->cityDbFilename : $settings->countryDbFilename;
 
+        if (empty($url)) {
+            GeoMate::log('No download URL is configured for the ' . $type . ' database. Please check your `' . $type . 'DbDownloadUrl` config setting.', Logger::LEVEL_ERROR);
+            return false;
+        }
+
         $pathinfo = pathinfo($url);
         $basename = $pathinfo['basename'];
         $sourcepath = FileHelper::normalizePath($tempPath . DIRECTORY_SEPARATOR . $basename);

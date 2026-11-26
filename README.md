@@ -159,8 +159,8 @@ If you enable this setting, GeoMate will try to download and unpack the database
 if it is missing. 
 
 Make sure you're certain that download works before enabling this. If something goes 
-wrong during the download, GeoMate will continue to try on every request, which could 
-take up alot of resources depending on what fails.  
+wrong during the download, GeoMate logs the error, the lookup returns no result (so no 
+redirect or redirect information), and GeoMate waits 10 minutes before trying to download again.  
 
 ### autoRedirectEnabled [bool]
 *Default: `false`*  

@@ -28,6 +28,24 @@ use yii\log\Logger;
  */
 class GeoService extends Component
 {
+    // Const Properties
+    // =========================================================================
+
+    /**
+     * Name of the mutex that serializes automatic database downloads
+     */
+    private const DOWNLOAD_MUTEX_NAME = 'geomate-db-download';
+
+    /**
+     * Cache key that marks a recently failed automatic database download
+     */
+    private const DOWNLOAD_BACKOFF_CACHE_KEY = 'geomate-db-download-backoff';
+
+    /**
+     * Number of seconds to wait before retrying a failed automatic database download
+     */
+    private const DOWNLOAD_BACKOFF_DURATION = 600;
+
     // Public Methods
     // =========================================================================
     /**
@@ -116,15 +134,12 @@ class GeoService extends Component
 
         if (!file_exists($dbPath)) {
             $errorMsg = 'The ' . $type . ' database does not exist in `' . $dbPath . '`. Please check your config settings, and run an automatic database download or place the database in the appropriate path.';
-            
+
             if ($settings->downloadDbIfMissing) {
-                GeoMate::getInstance()->database->updateDatabase();
-                
-                if (!file_exists($dbPath)) {
-                    GeoMate::log($errorMsg, Logger::LEVEL_ERROR);
-                    return null;
-                }
-            } else {
+                $this->downloadMissingDatabase($dbPath);
+            }
+
+            if (!file_exists($dbPath)) {
                 GeoMate::log($errorMsg, Logger::LEVEL_ERROR);
                 return null;
             }
@@ -148,6 +163,47 @@ class GeoService extends Component
         }
 
         return $data;
+    }
+
+    /**
+     * Tries to download the databases when a database file is missing and downloadDbIfMissing is enabled.
+     *
+     * Failures are logged instead of thrown, so a failing download never breaks the page. After a failed
+     * attempt, no new attempt is made until the backoff period has passed, and concurrent requests
+     * do not start parallel downloads.
+     *
+     * @param string $dbPath
+     * @return void
+     */
+    private function downloadMissingDatabase(string $dbPath): void
+    {
+        $cache = Craft::$app->getCache();
+
+        if ($cache->get(self::DOWNLOAD_BACKOFF_CACHE_KEY) !== false) {
+            return;
+        }
+
+        $mutex = Craft::$app->getMutex();
+
+        if (!$mutex->acquire(self::DOWNLOAD_MUTEX_NAME)) {
+            return;
+        }
+
+        try {
+            // Another request may have finished the download since the file was checked
+            if (!file_exists($dbPath)) {
+                GeoMate::getInstance()->database->updateDatabase();
+            }
+        } catch (\Throwable $throwable) {
+            // Only log the exception class and code, the message can contain the download URL
+            GeoMate::log('Automatic database download failed (' . get_class($throwable) . ', code ' . $throwable->getCode() . ')', Logger::LEVEL_ERROR);
+        } finally {
+            $mutex->release(self::DOWNLOAD_MUTEX_NAME);
+        }
+
+        if (!file_exists($dbPath)) {
+            $cache->set(self::DOWNLOAD_BACKOFF_CACHE_KEY, true, self::DOWNLOAD_BACKOFF_DURATION);
+        }
     }
 
     /**
