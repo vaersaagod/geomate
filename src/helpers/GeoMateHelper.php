@@ -164,6 +164,38 @@ class GeoMateHelper
     }
 
     /**
+     * Replaces the credentials in the given URLs (userinfo, and the values of sensitive query parameters
+     * like `license_key`) with a placeholder wherever they occur in a text, for instance in an exception
+     * message that includes a database download URL.
+     *
+     * @param string $text
+     * @param array<string|null> $urls
+     * @return string
+     */
+    public static function redactUrlCredentials(string $text, array $urls): string
+    {
+        $credentials = [];
+
+        foreach ($urls as $url) {
+            if (!is_string($url) || $url === '') {
+                continue;
+            }
+
+            foreach (self::getUrlCredentials($url) as $credential) {
+                $decoded = urldecode($credential);
+                array_push($credentials, $credential, $decoded, rawurldecode($credential), rawurlencode($decoded), urlencode($decoded));
+            }
+        }
+
+        $credentials = array_unique(array_filter($credentials, static fn(string $credential): bool => $credential !== ''));
+
+        // Longest first, so a credential is never partially replaced by a shorter variant of it
+        usort($credentials, static fn(string $a, string $b): int => strlen($b) <=> strlen($a));
+
+        return str_replace($credentials, str_repeat('•', 8), $text);
+    }
+
+    /**
      * Removes language tags that are longer than intl can parse (INTL_MAX_LOCALE_LEN) from an
      * Accept-Language header, since they make the parser throw. No browser sends tags that long.
      *
@@ -180,5 +212,51 @@ class GeoMateHelper
         );
 
         return implode(',', $tags);
+    }
+
+    /**
+     * Returns the credentials in a URL: the userinfo parts, and the values of query parameters with sensitive
+     * names (according to Craft's `sensitiveKeywords`). A URL that can't be parsed is treated as a credential.
+     *
+     * @param string $url
+     * @return string[]
+     */
+    private static function getUrlCredentials(string $url): array
+    {
+        $parts = parse_url($url);
+
+        if ($parts === false) {
+            return [$url];
+        }
+
+        $credentials = [];
+
+        if (isset($parts['user'])) {
+            $credentials[] = $parts['user'];
+        }
+
+        if (isset($parts['pass'])) {
+            $credentials[] = $parts['pass'];
+        }
+
+        if (!isset($parts['query']) || $parts['query'] === '') {
+            return $credentials;
+        }
+
+        $security = Craft::$app->getSecurity();
+
+        foreach (explode('&', $parts['query']) as $pair) {
+            if (!str_contains($pair, '=')) {
+                continue;
+            }
+
+            [$key, $value] = explode('=', $pair, 2);
+
+            if ($value !== '' && $security->isSensitive(urldecode($key))) {
+                $credentials[] = $value;
+            }
+        }
+
+        return $credentials;
     }
 }

@@ -92,6 +92,10 @@ and at most once every ten minutes. To require a secret key for the action URL, 
 a `geomateKey` query parameter (or send it in an `X-GeoMate-Key` header). Requests with a valid 
 key always download.
 
+Database downloads time out after 10 minutes, or after 15 seconds if the download server can't be 
+reached. To change this, set `timeout` and `connect_timeout` in Craft's `config/guzzle.php` file 
+(note that this file applies to all Guzzle requests made by Craft).
+
 ---
 
 ## Using GeoMate
@@ -130,6 +134,7 @@ Enables or disables caching of IP data.
 ### cacheDuration [string|int]
 *Default: `'P7D'`*  
 Duration that looked up IP data should be cached, set as a date interval string or an int indicating the number of seconds.
+Cached IP data is cleared when GeoMate updates the databases.
 
 ### useSeparateLogfile [bool]
 *Default: `true`*  

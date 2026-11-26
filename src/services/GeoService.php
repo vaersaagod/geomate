@@ -18,7 +18,9 @@ use GeoIp2\Model\City;
 use GeoIp2\Model\Country;
 use MaxMind\Db\Reader\InvalidDatabaseException;
 use vaersaagod\geomate\GeoMate;
+use vaersaagod\geomate\helpers\GeoMateHelper;
 use vaersaagod\geomate\models\Settings;
+use yii\caching\TagDependency;
 use yii\log\Logger;
 
 /**
@@ -41,6 +43,11 @@ class GeoService extends Component
      */
     private const DOWNLOAD_BACKOFF_DURATION = 600;
 
+    /**
+     * Cache tag for cached IP lookups, invalidated when the databases are updated
+     */
+    private const LOOKUP_CACHE_TAG = 'geomate-lookups';
+
     // Public Methods
     // =========================================================================
     /**
@@ -60,14 +67,18 @@ class GeoService extends Component
         $key = $this->getCacheKey('country', $ip);
         $cache = Craft::$app->getCache();
 
-        if ($settings->cacheEnabled && $cache->get($key) !== false) {
-            return $cache->get($key);
+        if ($settings->cacheEnabled) {
+            $cached = $cache->get($key);
+
+            if ($cached !== false) {
+                return $cached;
+            }
         }
 
         $data = $this->getInfoByType('country', $ip);
 
         if ($data !== null && $settings->cacheEnabled) {
-            $cache->set($key, $data, $settings->cacheDuration);
+            $cache->set($key, $data, $settings->cacheDuration, new TagDependency(['tags' => self::LOOKUP_CACHE_TAG]));
         }
 
         return $data;
@@ -100,17 +111,31 @@ class GeoService extends Component
         $key = $this->getCacheKey('city', $ip);
         $cache = Craft::$app->getCache();
 
-        if ($settings->cacheEnabled && $cache->get($key) !== false) {
-            return $cache->get($key);
+        if ($settings->cacheEnabled) {
+            $cached = $cache->get($key);
+
+            if ($cached !== false) {
+                return $cached;
+            }
         }
 
         $data = $this->getInfoByType('city', $ip);
 
         if ($data !== null && $settings->cacheEnabled) {
-            $cache->set($key, $data, $settings->cacheDuration);
+            $cache->set($key, $data, $settings->cacheDuration, new TagDependency(['tags' => self::LOOKUP_CACHE_TAG]));
         }
 
         return $data;
+    }
+
+    /**
+     * Invalidates all cached IP lookups, so that new lookups use the current databases.
+     *
+     * @return void
+     */
+    public function invalidateCache(): void
+    {
+        TagDependency::invalidate(Craft::$app->getCache(), self::LOOKUP_CACHE_TAG);
     }
 
 
@@ -190,8 +215,11 @@ class GeoService extends Component
                 GeoMate::getInstance()->database->updateDatabase();
             }
         } catch (\Throwable $throwable) {
-            // Only log the exception class and code, the message can contain the download URL
-            GeoMate::log('Automatic database download failed (' . get_class($throwable) . ', code ' . $throwable->getCode() . ')', Logger::LEVEL_ERROR);
+            // Download errors are already redacted by DatabaseService, the URLs are redacted again in case another error includes them
+            /** @var Settings $settings */
+            $settings = GeoMate::getInstance()->getSettings();
+            $message = GeoMateHelper::redactUrlCredentials($throwable->getMessage(), [$settings->countryDbDownloadUrl, $settings->cityDbDownloadUrl]);
+            GeoMate::log('Automatic database download failed (' . get_class($throwable) . '): ' . $message, Logger::LEVEL_ERROR);
         } finally {
             $mutex->release(DatabaseService::DOWNLOAD_MUTEX_NAME);
         }

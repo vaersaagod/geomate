@@ -17,6 +17,7 @@ use craft\helpers\StringHelper;
 use GuzzleHttp\ClientInterface;
 use MaxMind\Db\Reader;
 use vaersaagod\geomate\GeoMate;
+use vaersaagod\geomate\helpers\GeoMateHelper;
 use vaersaagod\geomate\models\Settings;
 use yii\base\ErrorException;
 use yii\base\Exception;
@@ -38,16 +39,38 @@ class DatabaseService extends Component
      */
     public const DOWNLOAD_MUTEX_NAME = 'geomate-db-download';
 
+    /**
+     * Number of seconds a database download may take to connect, unless config/guzzle.php sets `connect_timeout`
+     */
+    private const DOWNLOAD_CONNECT_TIMEOUT = 15;
+
+    /**
+     * Number of seconds a database download may take in total, unless config/guzzle.php sets `timeout`
+     */
+    private const DOWNLOAD_TIMEOUT = 600;
+
     // Public Methods
     // =========================================================================
 
-    /*
+    /**
      * @return bool
+     * @throws ErrorException
+     * @throws Exception
      */
     public function updateDatabase(): bool
     {
-        $resultCountry = $this->getDatabase('country');
-        $resultCity = $this->getDatabase('city');
+        $resultCountry = false;
+        $resultCity = false;
+
+        try {
+            $resultCountry = $this->getDatabase('country');
+            $resultCity = $this->getDatabase('city');
+        } finally {
+            // Cached lookups were made with the replaced database
+            if ($resultCountry || $resultCity) {
+                GeoMate::getInstance()->geo->invalidateCache();
+            }
+        }
 
         return $resultCountry && $resultCity;
     }
@@ -56,7 +79,6 @@ class DatabaseService extends Component
      * @param string $type
      * @throws ErrorException
      * @throws Exception
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function getDatabase($type = 'country'): bool
     {
@@ -107,22 +129,16 @@ class DatabaseService extends Component
         $runPath = FileHelper::normalizePath($tempPath . DIRECTORY_SEPARATOR . $type . '-' . StringHelper::randomString(12));
         FileHelper::createDirectory($runPath);
 
-        $pathinfo = pathinfo($url);
-        $basename = $pathinfo['basename'];
-        $sourcepath = FileHelper::normalizePath($runPath . DIRECTORY_SEPARATOR . $basename);
+        // Not named after the URL, which can contain the license key. PharData detects the archive format
+        // from the file contents, and a neutral extension works for both tar.gz and zip archives.
+        $sourcepath = FileHelper::normalizePath($runPath . DIRECTORY_SEPARATOR . $type . '.archive');
         $destpath = FileHelper::normalizePath($dbPath . DIRECTORY_SEPARATOR . $filename);
 
         // The new database is written next to the live one (same filesystem), so it can be moved into place atomically
         $tmpDestpath = $destpath . '.' . StringHelper::randomString(12) . '.tmp';
 
         try {
-            $client = Craft::createGuzzleClient();
-
-            if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION') && ClientInterface::MAJOR_VERSION >= 7) {
-                $client->get($url, ['sink' => $sourcepath]);
-            } else {
-                $client->get($url, ['save_to' => $sourcepath]);
-            }
+            $this->downloadArchive($url, $sourcepath, $type);
 
             $archive = new \PharData($sourcepath);
             $found = false;
@@ -204,6 +220,44 @@ class DatabaseService extends Component
 
     // Private Methods
     // =========================================================================
+
+    /**
+     * Downloads a database archive to the given path.
+     *
+     * Guzzle's exception messages include the request URL, which can contain the license key, so a
+     * failed download is rethrown with the credentials redacted (and without the original exception,
+     * whose message would otherwise end up in the logs).
+     *
+     * @param string $url
+     * @param string $sourcepath
+     * @param string $type
+     * @return void
+     * @throws Exception
+     */
+    private function downloadArchive(string $url, string $sourcepath, string $type): void
+    {
+        // Timeouts make sure a stalled download can't hold the update lock indefinitely.
+        // Timeouts set in config/guzzle.php take precedence.
+        $options = array_diff_key([
+            'connect_timeout' => self::DOWNLOAD_CONNECT_TIMEOUT,
+            'timeout' => self::DOWNLOAD_TIMEOUT,
+        ], Craft::$app->getConfig()->getConfigFromFile('guzzle'));
+
+        try {
+            $client = Craft::createGuzzleClient();
+
+            if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION') && ClientInterface::MAJOR_VERSION >= 7) {
+                $client->get($url, $options + ['sink' => $sourcepath]);
+            } else {
+                $client->get($url, $options + ['save_to' => $sourcepath]);
+            }
+        } catch (\Throwable $throwable) {
+            throw new Exception(
+                'Could not download the ' . $type . ' database (' . get_class($throwable) . '): ' . GeoMateHelper::redactUrlCredentials($throwable->getMessage(), [$url]),
+                (int)$throwable->getCode()
+            );
+        }
+    }
 
     /**
      * Whether the file is a readable MaxMind database (its metadata can be parsed).
