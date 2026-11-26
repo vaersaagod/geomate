@@ -38,22 +38,27 @@ class GeoMateHelper
     {
         /** @var Settings $settings */
         $settings = GeoMate::getInstance()->getSettings();
-        return GeoMate::$isRedirected || (Craft::$app->getRequest()->getParam($settings->redirectedParam, '') !== '');
+        return GeoMate::$isRedirected || (Craft::$app->getRequest()->getQueryParam($settings->redirectedParam, '') !== '');
     }
 
     public static function isOverridden(): bool
     {
         /** @var Settings $settings */
         $settings = GeoMate::getInstance()->getSettings();
-        return Craft::$app->getRequest()->getParam($settings->redirectOverrideParam, '') !== '';
+        return Craft::$app->getRequest()->getQueryParam($settings->redirectOverrideParam, '') !== '';
     }
 
     public static function getLanguages(): array
     {
         $r = [];
 
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $languages = AcceptLanguage::getLanguages($_SERVER['HTTP_ACCEPT_LANGUAGE'], 100);
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            try {
+                $languages = AcceptLanguage::getLanguages(self::filterAcceptLanguageHeader($_SERVER['HTTP_ACCEPT_LANGUAGE']), 100);
+            } catch (\Throwable) {
+                // A malformed Accept-Language header is treated as no accepted languages
+                return [];
+            }
 
             foreach ($languages as $quality => $info) {
                 $languageModel = new AcceptedLanguage();
@@ -156,5 +161,24 @@ class GeoMateHelper
     public static function addQueryString(string $url, string $queryString): string
     {
         return UrlHelper::url($url, $queryString);
+    }
+
+    /**
+     * Removes language tags that are longer than intl can parse (INTL_MAX_LOCALE_LEN) from an
+     * Accept-Language header, since they make the parser throw. No browser sends tags that long.
+     *
+     * @param string $header
+     * @return string
+     */
+    private static function filterAcceptLanguageHeader(string $header): string
+    {
+        $maxLength = defined('INTL_MAX_LOCALE_LEN') ? INTL_MAX_LOCALE_LEN : 156;
+
+        $tags = array_filter(
+            explode(',', $header),
+            static fn(string $tag): bool => strlen(trim(explode(';', $tag, 2)[0])) <= $maxLength
+        );
+
+        return implode(',', $tags);
     }
 }

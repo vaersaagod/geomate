@@ -172,7 +172,7 @@ class GeoMate extends Plugin
         /** @var Settings $settings */
         $settings = $this->getSettings();
 
-        $redirectOverrideParam = $request->getParam($settings->redirectOverrideParam);
+        $redirectOverrideParam = $request->getQueryParam($settings->redirectOverrideParam);
         if (!empty($redirectOverrideParam) && $redirectOverrideParam === $settings->paramValue) {
             $this->redirect->registerOverride();
         }
@@ -182,7 +182,7 @@ class GeoMate extends Plugin
         }
 
         if ($settings->addGetParameterOnRedirect) {
-            $redirectedParam = $request->getParam($settings->redirectedParam);
+            $redirectedParam = $request->getQueryParam($settings->redirectedParam);
             self::$isRedirected = !empty($redirectedParam) && $redirectedParam === $settings->paramValue;
         } else {
             self::$isRedirected = Craft::$app->getSession()->hasFlash('geomateIsRedirected');

@@ -70,7 +70,8 @@ class CookieService extends Component
      */
     private function getCookie($name = '')
     {
-        if (isset($_COOKIE[$name])) {
+        // Only plain, non-empty string values are valid (PHP registers cookies like "name[x]=1" as arrays)
+        if (isset($_COOKIE[$name]) && is_string($_COOKIE[$name]) && $_COOKIE[$name] !== '') {
             return $_COOKIE[$name];
         }
 
