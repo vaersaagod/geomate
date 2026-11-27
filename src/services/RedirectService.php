@@ -130,10 +130,12 @@ class RedirectService extends Component
             return null;
         }
         
-        $queryString = Craft::$app->getRequest()->getQueryStringWithoutPath();
-        
-        if ($queryString !== '') {
-            $redirectUrl = GeoMateHelper::addQueryString($redirectUrl, $queryString);
+        // Uses the query params PHP already parsed (and capped at max_input_vars). The raw query string would be
+        // parsed again by UrlHelper, which throws if it has more params than max_input_vars allows.
+        $queryParams = Craft::$app->getRequest()->getQueryParamsWithoutPath();
+
+        if ($queryParams !== []) {
+            $redirectUrl = GeoMateHelper::addQueryString($redirectUrl, $queryParams);
         }
 
         $info = new RedirectInfo();

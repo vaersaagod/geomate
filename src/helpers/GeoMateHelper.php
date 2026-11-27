@@ -158,7 +158,12 @@ class GeoMateHelper
         return UrlHelper::url($url, [$param => $value]);
     }
 
-    public static function addQueryString(string $url, string $queryString): string
+    /**
+     * @param string $url
+     * @param array|string $queryString A query string, or an array of query params
+     * @return string
+     */
+    public static function addQueryString(string $url, array|string $queryString): string
     {
         return UrlHelper::url($url, $queryString);
     }
